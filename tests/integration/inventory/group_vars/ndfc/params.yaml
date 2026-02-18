@@ -1,0 +1,14 @@
+ansible_connection: ansible.netcommon.httpapi
+ansible_network_os: cisco.dcnm.dcnm
+ansible_httpapi_validate_certs: no
+ansible_httpapi_use_ssl: no
+ansible_user: admin
+device_username: admin
+device_password: dummy_password
+ansible_password: dummy_password
+
+# For NDFC Mock in a container, uncomment these options
+#ansible_httpapi_port: 8080
+
+# For NDFC Mock outside a container, uncomment these options
+ansible_httpapi_port: 8000

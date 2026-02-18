@@ -1,0 +1,232 @@
+# Example playbook for dcnm_fabric
+# 1. delete fabric (no verification)
+# 1. query fabrics (verify DATA length == 0)
+# 2. create fabric (verify parameter values == expected)
+# 3. query fabrics (verify parameter values == expected)
+# 4. modify fabric (verify parameter values == expected)
+# 5. query fabrics (verify parameter values == expected)
+# 6. delete fabric (verify response.MESSAGE == expected)
+# 7. query fabrics (verify DATA length == 0)
+---
+-   hosts: ndfc
+    check_mode: false
+    gather_facts: false
+    tasks:
+    - name: Delete VXLAN Fabric
+      cisco.dcnm.dcnm_fabric:
+        state: deleted
+        config:
+        -   FABRIC_NAME: TEST_FABRIC
+      register: result
+    - debug:
+        var: result
+
+    - name: Query VXLAN Fabric
+      cisco.dcnm.dcnm_fabric:
+        state: query
+        config:
+        -   FABRIC_NAME: TEST_FABRIC
+      register: result
+    - debug:
+        var: result
+    - assert:
+        that:
+        - result.changed == false
+        - result.failed == false
+        - (result.diff | length) == 1
+        - result.diff[0].sequence_number == 1
+        - (result.response | length) == 1
+        - result.response[0].sequence_number == 1
+        - result.response[0].MESSAGE == "OK"
+        - result.response[0].METHOD == "GET"
+        - result.response[0].RETURN_CODE == 200
+
+    - name: Create VXLAN Fabric
+      cisco.dcnm.dcnm_fabric:
+        state: merged
+        config:
+        -   FABRIC_NAME: TEST_FABRIC
+            FABRIC_TYPE: VXLAN_EVPN
+            BGP_AS: "65001"
+            RR_COUNT: 4
+            RP_COUNT: 4
+      register: result
+    - debug:
+        var: result
+    - assert:
+        that:
+        - result.changed == true
+        - result.failed == false
+        - (result.diff | length) == 1
+        - result.diff[0].BGP_AS == "65001"
+        - result.diff[0].FABRIC_NAME == "TEST_FABRIC"
+        - result.diff[0].sequence_number == 1
+        - (result.response | length) == 1
+        - result.response[0].sequence_number == 1
+        - result.response[0].MESSAGE == "OK"
+        - result.response[0].METHOD == "POST"
+        - result.response[0].RETURN_CODE == 200
+        - result.response[0].DATA.nvPairs.BGP_AS == "65001"
+        - result.response[0].DATA.nvPairs.REPLICATION_MODE == "Multicast"
+        - result.response[0].DATA.nvPairs.RR_COUNT in [4, "4"]
+        - result.response[0].DATA.nvPairs.TCAM_ALLOCATION in [true, "true"]
+
+    - name: Query VXLAN Fabric
+      cisco.dcnm.dcnm_fabric:
+        state: query
+        config:
+        -   FABRIC_NAME: TEST_FABRIC
+      register: result
+    - debug:
+        var: result
+    - assert:
+        that:
+        - result.changed == false
+        - result.failed == false
+        - (result.diff | length) == 1
+        - result.diff[0].sequence_number == 1
+        - result.diff[0].TEST_FABRIC.nvPairs.BGP_AS in [65001, "65001"]
+        - result.diff[0].TEST_FABRIC.nvPairs.FABRIC_NAME == "TEST_FABRIC"
+        - (result.response | length) == 1
+        - result.response[0].sequence_number == 1
+        - result.response[0].MESSAGE == "OK"
+        - result.response[0].METHOD == "GET"
+        - result.response[0].RETURN_CODE == 200
+        - (result.response[0].DATA | length) == 1
+        - result.response[0].DATA[0].nvPairs.BGP_AS in [65001, "65001"]
+        - result.response[0].DATA[0].nvPairs.REPLICATION_MODE == "Multicast"
+        - result.response[0].DATA[0].nvPairs.RR_COUNT in [4, "4"]
+        - result.response[0].DATA[0].nvPairs.TCAM_ALLOCATION in [true, "true"]
+
+    # Modify the fabric and verify:
+    # 1. The following parameters are updated
+    #    - BGP_AS
+    #    - REPLICATION_MODE
+    # 2. result.diff length == 3
+    #    - 1 diff item for modify
+    #    - 1 diff item for config-save
+    #    - 1 diff item for config-deploy
+    #    Since config DEPLOY is False, by default,
+    #    dcnm_fabric does not call the config-save
+    #    and config-deploy endpoints.
+
+    - name: Modify VXLAN Fabric
+      cisco.dcnm.dcnm_fabric:
+        state: merged
+        config:
+        -   FABRIC_NAME: TEST_FABRIC
+            FABRIC_TYPE: VXLAN_EVPN
+            BGP_AS: "65111"
+            REPLICATION_MODE: Ingress
+            RR_COUNT: 2
+            TCAM_ALLOCATION: false
+      register: result
+    - debug:
+        var: result
+    - assert:
+        that:
+        - result.changed == true
+        - result.failed == false
+        - (result.diff | length) == 3
+        - result.diff[0].BGP_AS in [65111, "65111"]
+        - result.diff[0].FABRIC_NAME == "TEST_FABRIC"
+        - result.diff[0].sequence_number == 1
+        - (result.response | length) == 3
+        - result.response[0].sequence_number == 1
+        - result.response[0].MESSAGE == "OK"
+        - result.response[0].METHOD == "PUT"
+        - result.response[0].RETURN_CODE == 200
+        - result.response[0].DATA.nvPairs.BGP_AS == "65111"
+        - result.response[0].DATA.nvPairs.REPLICATION_MODE == "Ingress"
+        - result.response[0].DATA.nvPairs.RR_COUNT in [2, "2"]
+        - result.response[0].DATA.nvPairs.TCAM_ALLOCATION in [false, "false"]
+
+    # Query the fabric and verify the above fields are displayed
+    # with the new values.
+    - name: Query VXLAN Fabric
+      cisco.dcnm.dcnm_fabric:
+        state: query
+        config:
+        -   FABRIC_NAME: TEST_FABRIC
+      register: result
+    - debug:
+        var: result
+    - assert:
+        that:
+        - result.changed == false
+        - result.failed == false
+        - (result.diff | length) == 1
+        - result.diff[0].sequence_number == 1
+        - result.diff[0].TEST_FABRIC.nvPairs.BGP_AS in [65111, "65111"]
+        - result.diff[0].TEST_FABRIC.nvPairs.FABRIC_NAME == "TEST_FABRIC"
+        - (result.response | length) == 1
+        - result.response[0].sequence_number == 1
+        - result.response[0].MESSAGE == "OK"
+        - result.response[0].METHOD == "GET"
+        - result.response[0].RETURN_CODE == 200
+        - (result.response[0].DATA | length) == 1
+        - result.response[0].DATA[0].nvPairs.BGP_AS in [65111, "65111"]
+        - result.response[0].DATA[0].nvPairs.REPLICATION_MODE == "Ingress"
+        - result.response[0].DATA[0].nvPairs.RR_COUNT in [2, "2"]
+        - result.response[0].DATA[0].nvPairs.TCAM_ALLOCATION in [false, "false"]
+
+    - name: Modify VXLAN Fabric (Negative, Bad RR_COUNT)
+      cisco.dcnm.dcnm_fabric:
+        state: merged
+        config:
+        -   FABRIC_NAME: TEST_FABRIC
+            FABRIC_TYPE: VXLAN_EVPN
+            BGP_AS: "65111"
+            RR_COUNT: 3
+      register: result
+      ignore_errors: True
+    - debug:
+        var: result
+    - assert:
+        that:
+        - result.failed == true
+        - result.changed == false
+
+    - name: Delete VXLAN Fabric
+      cisco.dcnm.dcnm_fabric:
+        state: deleted
+        config:
+        -   FABRIC_NAME: TEST_FABRIC
+      register: result
+    - debug:
+        var: result
+    - assert:
+        that:
+        - result.changed == true
+        - result.failed == false
+        - (result.diff | length) == 1
+        - result.diff[0].sequence_number == 1
+        - (result.response | length) == 1
+        - result.response[0].sequence_number == 1
+        - result.response[0].MESSAGE == "OK"
+        - result.response[0].METHOD == "DELETE"
+        - result.response[0].RETURN_CODE == 200
+        - (result.response[0].DATA | length) == 1
+        - result.response[0].DATA[0] == "Fabric 'TEST_FABRIC' is deleted successfully!"
+
+    # Verify the fabric is deleted (DATA length == 0)
+    - name: Query VXLAN Fabric
+      cisco.dcnm.dcnm_fabric:
+        state: query
+        config:
+        -   FABRIC_NAME: TEST_FABRIC
+      register: result
+    - debug:
+        var: result
+    - assert:
+        that:
+        - result.changed == false
+        - result.failed == false
+        - (result.diff | length) == 1
+        - result.diff[0].sequence_number == 1
+        - (result.response | length) == 1
+        - result.response[0].sequence_number == 1
+        - (result.response[0].DATA | length) == 0
+        - result.response[0].MESSAGE == "OK"
+        - result.response[0].METHOD == "GET"
+        - result.response[0].RETURN_CODE == 200

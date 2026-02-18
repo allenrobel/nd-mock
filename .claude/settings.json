@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "source /Users/arobel/repos/nd-mock/.venv/bin/activate && ruff format --line-length 180 \"$CLAUDE_FILE_PATH\" 2>/dev/null && ruff check --fix --line-length 180 \"$CLAUDE_FILE_PATH\" 2>/dev/null; true"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"$CLAUDE_FILE_PATH\" | grep -qE '\\.(env|db)$' && echo 'BLOCKED: Cannot edit .env or .db files' && exit 1 || exit 0"
+          }
+        ]
+      }
+    ]
+  }
+}

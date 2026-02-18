@@ -1,0 +1,186 @@
+# integration test - inventory
+# 1. Create fabric
+# 2. Merge border gateway spine switch
+# 3. Merge leaf switch
+# 4. Query switches and verify response
+# 5. Query switch overview (REST) and verify response
+# 6. Delete switches
+# 7. Delete fabric
+---
+-   hosts: ndfc
+    check_mode: false
+    gather_facts: false
+    vars:
+        fabric_name: TEST_FABRIC
+        switch1: 10.1.1.1
+        switch2: 10.1.1.2
+        switch_username: admin
+        switch_password: mypassword
+    tasks:
+
+    - name: Create VXLAN Fabric
+      cisco.dcnm.dcnm_fabric:
+        state: merged
+        config:
+        -   FABRIC_NAME: "{{ fabric_name }}"
+            FABRIC_TYPE: VXLAN_EVPN
+            BGP_AS: "65001"
+            REPLICATION_MODE: Multicast
+            RR_COUNT: 4
+            RP_COUNT: 4
+      register: result
+    - debug:
+        var: result
+    - assert:
+        that:
+        - result.changed == true
+        - result.failed == false
+        - (result.diff | length) == 1
+        - result.diff[0].sequence_number == 1
+        - result.diff[0].BGP_AS in [65001, "65001"]
+        - result.diff[0].FABRIC_NAME == "TEST_FABRIC"
+        - result.diff[0].RP_COUNT == 4
+        - result.diff[0].RR_COUNT == 4
+        - (result.response | length) == 1
+        - result.response[0].sequence_number == 1
+        - result.response[0].MESSAGE == "OK"
+        - result.response[0].METHOD == "POST"
+        - result.response[0].RETURN_CODE == 200
+        - result.response[0].DATA.nvPairs.BGP_AS in [65001, "65001"]
+        - result.response[0].DATA.nvPairs.REPLICATION_MODE == "Multicast"
+        - result.response[0].DATA.nvPairs.RP_COUNT in [4, "4"]
+        - result.response[0].DATA.nvPairs.RR_COUNT in [4, "4"]
+        - result.response[0].DATA.nvPairs.TCAM_ALLOCATION in [true, "true"]
+
+    - name: MERGED - Merge switch1 border_gateway_spine
+      cisco.dcnm.dcnm_inventory:
+        fabric: "{{ fabric_name }}"
+        state: merged
+        config:
+        - seed_ip: "{{ switch1 }}"
+          auth_proto: MD5
+          user_name: "{{ switch_username }}"
+          password: "{{ switch_password }}"
+          max_hops: 0
+          role: border_gateway_spine
+          preserve_config: True
+      register: result
+    - debug:
+        var: result
+
+    - assert:
+        that:
+        - result.changed == true
+        - result.failed == false
+        - (result.response | length) == 6
+        - result.response[0].DATA[0].ipaddr == switch1
+        - result.response[0].DATA[0].platform == "N9K-C93180YC-EX"
+        - result.response[0].DATA[0].version == "10.2(5)"
+        - result.response[3].DATA.newRole == "border gateway spine"
+        - result.response[3].DATA.tierLevel == 2
+
+    - name: MERGED - Merge switch2 leaf
+      cisco.dcnm.dcnm_inventory:
+        fabric: "{{ fabric_name }}"
+        state: merged
+        config:
+        - seed_ip: "{{ switch2 }}"
+          auth_proto: MD5
+          user_name: "{{ switch_username }}"
+          password: "{{ switch_password }}"
+          max_hops: 0
+          role: leaf
+          preserve_config: True
+      register: result
+    - debug:
+        var: result
+
+    - assert:
+        that:
+        - result.changed == true
+        - result.failed == false
+        - (result.response | length) == 6
+        - result.response[0].DATA[0].ipaddr == switch2
+        - result.response[0].DATA[0].platform == "N9K-C93180YC-EX"
+        - result.response[0].DATA[0].version == "10.2(5)"
+        - result.response[3].DATA.newRole == "leaf"
+        - result.response[3].DATA.tierLevel == 3
+
+    - name: Query all the switches in the fabric
+      cisco.dcnm.dcnm_inventory:
+        fabric: "{{ fabric_name }}"
+        state: query
+      register: result
+    - debug:
+        var: result
+
+    - assert:
+        that:
+        - result.changed == false
+        - result.failed == false
+        - (result.response | length) == 2
+        - result.response[0].ipAddress == switch1
+        - result.response[1].ipAddress == switch2
+        - result.response[0].version == "10.2(5)"
+        - result.response[1].version == "10.2(5)"
+        - result.response[0].switchRole == "border gateway spine"
+        - result.response[1].switchRole == "leaf"
+        - result.response[0].switchRoleEnum == "borderGatewaySpine"
+        - result.response[1].switchRoleEnum == "leaf"
+
+    - name: REST - GET switch overview
+      cisco.dcnm.dcnm_rest:
+        method: GET
+        path: /appcenter/cisco/ndfc/api/v1/lan-fabric/rest/control/switches/{{fabric_name}}/overview
+      register: result
+    - debug:
+        var: result
+
+    - assert:
+        that:
+        - result.changed == false
+        - result.failed == false
+        - result.response.DATA.switchConfig.in_sync == 2
+        - result.response.DATA.switchHWVersions["N9K-C93180YC-EX"] == 2
+        - result.response.DATA.switchHealth.Healthy == 2
+        - result.response.DATA.switchRoles["border gateway spine"] == 1
+        - result.response.DATA.switchRoles["leaf"] == 1
+
+    - name: Delete selected switches
+      cisco.dcnm.dcnm_inventory:
+        fabric: "{{ fabric_name }}"
+        state: deleted
+        config:
+        - seed_ip: "{{ switch1 }}"
+        - seed_ip: "{{ switch2 }}"
+      register: result
+    - debug:
+        var: result
+
+    - set_fact:
+        TEST_PHRASE: "have been removed from the fabric="
+
+    - assert:
+        that:
+        - result.changed == true
+        - result.failed == false
+        - TEST_PHRASE in result.response[0].DATA
+        - TEST_PHRASE in result.response[1].DATA
+
+    - name: Delete fabric
+      cisco.dcnm.dcnm_fabric:
+        state: deleted
+        config:
+        -   FABRIC_NAME: "{{ fabric_name }}"
+      register: result
+    - debug:
+        var: result
+
+    - set_fact:
+        TEST_PHRASE: "is deleted successfully"
+
+    - assert:
+        that:
+        - result.changed == true
+        - result.failed == false
+        - TEST_PHRASE in result.response[0].DATA[0]
