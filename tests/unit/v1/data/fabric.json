@@ -1,0 +1,120 @@
+{
+    "test_v1_fabric_delete_100": {
+        "test_info": {
+            "testcase": "test_v1_fabric_delete_100",
+            "description": [
+                "Fabric DELETE API.",
+                "200 response valid request body.",
+                "Create a fabric for later deletion."
+            ],
+            "tags": [
+                "fabric",
+                "delete"
+            ]
+        },
+        "category": "fabric",
+        "licenseTier": "essentials",
+        "location": {
+            "latitude": 37.33939,
+            "longitude": -121.89496
+        },
+        "management": {
+            "bgpAsn": 65001,
+            "type": "vxlanIbgp"
+        },
+        "name": "F1",
+        "securityDomain": "all",
+        "telemetryCollectionType": "inBand",
+        "telemetrySourceInterface": "",
+        "telemetrySourceVrf": "",
+        "telemetryStreamingProtocol": "ipv6"
+    },
+    "test_v1_fabric_post_100": {
+        "test_info": {
+            "testcase": "test_v1_fabric_post_100",
+            "description": [
+                "Fabric POST API.",
+                "200 response valid request body."
+            ],
+            "tags": [
+                "fabric",
+                "post"
+            ]
+        },
+        "category": "fabric",
+        "licenseTier": "essentials",
+        "location": {
+            "latitude": 37.33939,
+            "longitude": -121.89496
+        },
+        "management": {
+            "bgpAsn": 65001,
+            "type": "vxlanIbgp"
+        },
+        "name": "F1",
+        "securityDomain": "all",
+        "telemetryCollectionType": "inBand",
+        "telemetrySourceInterface": "",
+        "telemetrySourceVrf": "",
+        "telemetryStreamingProtocol": "ipv6"
+    },
+    "test_v1_fabric_post_200": {
+        "test_info": {
+            "testcase": "test_v1_fabric_post_200",
+            "description": [
+                "Fabric POST API.",
+                "400 response when management.bgpAsn is missing."
+            ],
+            "tags": [
+                "fabric",
+                "post"
+            ]
+        },
+        "category": "fabric",
+        "licenseTier": "essentials",
+        "location": {
+            "latitude": 37.33939,
+            "longitude": -121.89496
+        },
+        "management": {
+            "type": "vxlanIbgp"
+        },
+        "name": "F1",
+        "securityDomain": "all",
+        "telemetryCollectionType": "inBand",
+        "telemetrySourceInterface": "",
+        "telemetrySourceVrf": "",
+        "telemetryStreamingProtocol": "ipv6"
+    },
+    "test_v1_fabric_post_210": {
+        "test_info": {
+            "testcase": "test_v1_fabric_post_210",
+            "description": [
+                "Fabric POST API.",
+                "500 response when bgpAsn fails regex validation."
+            ],
+            "tags": [
+                "fabric",
+                "post"
+            ]
+        },
+        "category": "fabric",
+        "licenseTier": "essentials",
+        "location": {
+            "latitude": 37.33939,
+            "longitude": -121.89496
+        },
+        "management": {
+            "bgpAsn": {
+                "foo": "bar"
+            },
+            "type": "vxlanIbgp"
+        },
+        "name": "F1",
+        "securityDomain": "all",
+        "telemetryCollectionType": "inBand",
+        "telemetrySourceInterface": "",
+        "telemetrySourceVrf": "",
+        "telemetryStreamingProtocol": "ipv6"
+    }
+}

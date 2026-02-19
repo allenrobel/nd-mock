@@ -18,8 +18,7 @@ app/
   db.py           # Database session/engine setup
   main.py         # Router registration (all endpoints wired here)
   common/         # Shared enums, functions, validators
-  v1/             # V1 API: endpoints, models, templates, validators
-  v2/             # V2 API: endpoints, models, validators
+  v1/             # V1 API: endpoints, models, validators
 schema/           # JSON schema files (infra.json, manage.json)
 tests/
   unit/           # Unit tests
@@ -46,7 +45,7 @@ utils/            # Utility scripts (docs_generate.py)
 
 ## Adding New Endpoints
 
-1. Create endpoint module in `app/v1/endpoints/` or `app/v2/endpoints/` with a `router = APIRouter()`
-2. Create corresponding models in `app/v1/models/` or `app/v2/models/`
+1. Create endpoint module in `app/v1/endpoints/` with a `router = APIRouter()`
+2. Create corresponding models in `app/v1/models/`
 3. Import the endpoint in `app/main.py` and register with `app.include_router()`
 4. Add tests in `tests/unit/`
