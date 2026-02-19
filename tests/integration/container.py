@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2024 Cisco and/or its affiliates.
+# Copyright (c) 2026 Cisco and/or its affiliates.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
-__copyright__ = "Copyright (c) 2024 Cisco and/or its affiliates."
+__copyright__ = "Copyright (c) 2026 Cisco and/or its affiliates."
 __author__ = "Allen Robel"
 
 import json
@@ -26,7 +26,7 @@ from os import environ
 """
 # Summary
 
-Optional dynamic inventory for the ndfc_mock repository
+Optional dynamic inventory for the nd-mock repository
 integration tests. This inventory is built from environment
 variables.
 
@@ -191,7 +191,7 @@ else:
 output = {
     "_meta": {"hostvars": {}},
     "all": {
-        "children": ["ungrouped", "ndfc", "nxos"],
+        "children": ["ungrouped", "nd", "nxos"],
         "vars": {
             "ansible_httpapi_use_ssl": "false",
             "ansible_httpapi_validate_certs": "false",
@@ -227,14 +227,14 @@ output = {
             "interface_3a": interface_3a,
         },
     },
-    "ndfc": {
+    "nd": {
         "hosts": [nd_ip4],
         "vars": {
             "ansible_connection": "ansible.netcommon.httpapi",
             "ansible_httpapi_port": nd_port,
             "ansible_httpapi_use_ssl": "false",
             "ansible_httpapi_validate_certs": "false",
-            "ansible_network_os": "cisco.dcnm.dcnm",
+            "ansible_network_os": "cisco.nd.nd",
         },
     },
     "nxos": {

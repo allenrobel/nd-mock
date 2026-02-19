@@ -79,7 +79,7 @@ def write_endpoints_to_markdown(lines: list) -> None:
     Write the endpoints to a markdown file.
     """
     home = environ["HOME"]
-    repo = f"{home}/repos/podman/ndfc_mock"
+    repo = f"{home}/repos/podman/nd-mock"
     filename = f"{repo}/docs/supported_endpoints.md"
 
     if lines[-1] == "" and lines[-2] == "":
@@ -107,9 +107,6 @@ def main():
     lines = []
     lines.append("# Supported Endpoints")
     lines.append("")
-    lines.append("- V1 denotes Nexus Dashboard 3.x endpoint")
-    lines.append("- V2 denotes Nexus Dashboard 4.x endpoint")
-    lines.append("- We are migrating endpoints out of Default and into their respective tags over the next week or so...")
     lines.append("")
     for tag, endpoints in tags.items():
         lines.append(f"## {tag}")

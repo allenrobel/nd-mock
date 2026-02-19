@@ -26,7 +26,7 @@ from os import environ
 """
 # Summary
 
-Optional dynamic inventory for the ndfc_mock repository
+Optional dynamic inventory for the nd-mock repository
 integration tests. This inventory is built from environment
 variables.
 
