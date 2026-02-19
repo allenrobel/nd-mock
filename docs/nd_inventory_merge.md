@@ -1,8 +1,6 @@
-# ansible-dcnm.dcnm_inventory - merge state call flow
+# ansible-nd - merge state call flow for switch inventory management
 
-Endpoint call flow used by the [ansible-dcnm - dcnm_inventory][dcnm_inventory] module for merge state.
-
-These are the v2 (manage) API endpoints introduced in Nexus Dashboard 4.x. The v1 (`lan-fabric/rest`) endpoints are deprecated in ND 4.2 and will be removed in ND 4.3.
+Below is a typical call flow for managing switches with Nexus Dashboard 4.2.
 
 ## 1. Add switches (discover)
 
@@ -126,5 +124,3 @@ HTTP 207 Multi-Status
     ]
 }
 ```
-
-[dcnm_inventory]: <https://github.com/CiscoDevNet/ansible-dcnm/blob/main/plugins/modules/dcnm_inventory.py>
