@@ -116,5 +116,51 @@
         "telemetrySourceInterface": "",
         "telemetrySourceVrf": "",
         "telemetryStreamingProtocol": "ipv6"
+    },
+    "test_v1_fabric_post_300": {
+        "test_info": {
+            "testcase": "test_v1_fabric_post_300",
+            "description": [
+                "Fabric POST API.",
+                "Verify full management object is stored and returned."
+            ],
+            "tags": [
+                "fabric",
+                "post",
+                "management"
+            ]
+        },
+        "category": "fabric",
+        "licenseTier": "essentials",
+        "location": {
+            "latitude": 37.33939,
+            "longitude": -121.89496
+        },
+        "management": {
+            "bgpAsn": 65001,
+            "type": "vxlanEbgp",
+            "replicationMode": "multicast",
+            "anycastGatewayMac": "2020.0000.00aa",
+            "enableDefaultQueuing": false,
+            "enablePvlan": false,
+            "enableScheduledBackup": false,
+            "enableTrm": false,
+            "grField": "",
+            "hdTime": 180,
+            "linkStateRouting": "ospf",
+            "maxBgpPaths": 1,
+            "mtu": 9216,
+            "routingLoopbackId": 0,
+            "vtepLoopbackId": 1,
+            "subnetRange": "10.4.0.0/16",
+            "subnetTargetMask": 30,
+            "underlayRoutingProtocol": "ospf"
+        },
+        "name": "F_FULL",
+        "securityDomain": "all",
+        "telemetryCollectionType": "inBand",
+        "telemetrySourceInterface": "",
+        "telemetrySourceVrf": "",
+        "telemetryStreamingProtocol": "ipv6"
     }
 }

@@ -1,4 +1,5 @@
 import copy
+import json
 from typing import Any, List
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -6,7 +7,7 @@ from sqlmodel import Session, func, select
 
 from .....db import get_session
 from ....models.fabric import FabricDbModel, FabricResponseModel, FabricsListMeta, FabricsListResponse
-from .common import FabricLocationModel, FabricManagementModel
+from .common import FabricLocationModel
 
 router = APIRouter(
     prefix="/api/v1/manage",
@@ -23,17 +24,14 @@ def build_response(fabric: FabricDbModel) -> FabricResponseModel:
         latitude=fabric.latitude,
         longitude=fabric.longitude,
     )
-    management = FabricManagementModel(
-        bgpAsn=fabric.bgpAsn,
-        type=fabric.type,
-    )
+    management = json.loads(fabric.management)
     response: FabricResponseModel = FabricResponseModel(
         alertSuspend=fabric.alertSuspend,
         name=fabric.name,
         category=fabric.category,
         licenseTier=fabric.licenseTier,
         location=location.model_dump(),
-        management=management.model_dump(),
+        management=management,
         securityDomain=fabric.securityDomain,
         telemetryCollection=fabric.telemetryCollection,
         telemetryCollectionType=fabric.telemetryCollectionType,

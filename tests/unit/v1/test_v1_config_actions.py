@@ -12,7 +12,7 @@ from ..common import client_fixture, session_fixture
 
 def _create_fabric(session: Session, name: str = "f1") -> FabricDbModel:
     fabric = FabricDbModel(
-        bgpAsn="65001",
+        management='{"bgpAsn": "65001", "type": "fabric"}',
         category="fabric",
         latitude=71.1,
         longitude=61.1,
@@ -23,7 +23,6 @@ def _create_fabric(session: Session, name: str = "f1") -> FabricDbModel:
         telemetrySourceInterface="Ethernet1/1",
         telemetrySourceVrf="vrf_1",
         telemetryStreamingProtocol="ipv4",
-        type="fabric",
     )
     session.add(fabric)
     session.commit()

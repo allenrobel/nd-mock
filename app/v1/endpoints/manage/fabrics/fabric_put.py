@@ -1,10 +1,12 @@
 #!/usr/bin/env python
+import json
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 
 from .....db import get_session
 from ....models.fabric import FabricDbModel, FabricResponseModel
-from .common import FabricLocationModel, FabricManagementModel
+from .common import FabricLocationModel
 
 router = APIRouter(
     prefix="/api/v1/manage/fabrics",
@@ -21,17 +23,14 @@ def build_response(fabric: FabricDbModel) -> FabricResponseModel:
         latitude=fabric.latitude,
         longitude=fabric.longitude,
     )
-    management = FabricManagementModel(
-        bgpAsn=fabric.bgpAsn,
-        type=fabric.type,
-    )
+    management = json.loads(fabric.management)
     response: FabricResponseModel = FabricResponseModel(
         alertSuspend=fabric.alertSuspend,
         name=fabric.name,
         category=fabric.category,
         licenseTier=fabric.licenseTier,
         location=location.model_dump(),
-        management=management.model_dump(),
+        management=management,
         securityDomain=fabric.securityDomain,
         telemetryCollection=fabric.telemetryCollection,
         telemetryCollectionType=fabric.telemetryCollectionType,
@@ -54,8 +53,7 @@ def build_db_fabric(fabric):
     db_fabric.name = fabric.name
     db_fabric.category = fabric.category
     db_fabric.licenseTier = fabric.licenseTier
-    db_fabric.bgpAsn = fabric_dict.get("management", {}).get("bgpAsn")
-    db_fabric.type = fabric_dict.get("management", {}).get("type")
+    db_fabric.management = json.dumps(fabric_dict.get("management", {}))
     db_fabric.latitude = fabric_dict.get("location", {}).get("latitude")
     db_fabric.longitude = fabric_dict.get("location", {}).get("longitude")
     db_fabric.securityDomain = fabric.securityDomain
@@ -93,9 +91,12 @@ def fabric_put(
         raise HTTPException(status_code=404, detail=f"Fabric {fabric_name} not found")
     fabric_data = fabric.model_dump(exclude_unset=True)
 
-    nested_keys = ["management", "location"]
     for key, value in fabric_data.items():
-        if key in nested_keys:
+        if key == "management":
+            existing = json.loads(db_fabric.management)
+            existing.update(value)
+            db_fabric.management = json.dumps(existing)
+        elif key == "location":
             for nested_key, nested_value in value.items():
                 setattr(db_fabric, nested_key, nested_value)
         else:

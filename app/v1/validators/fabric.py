@@ -24,6 +24,7 @@ def validate_fabric_management(fabric_management: dict) -> dict:
         except ValueError as error:
             msg = "Error in validating provided name value pair: [bgpAsn]"
             raise HTTPException(status_code=500, detail=msg) from error
+        fabric_management["bgpAsn"] = bgp_asn
     return fabric_management
 
 

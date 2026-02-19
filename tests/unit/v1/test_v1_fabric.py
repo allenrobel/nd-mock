@@ -97,6 +97,31 @@ def test_v1_fabric_post_210(client: TestClient):
     assert response.status_code == 500
 
 
+def test_v1_fabric_post_300(client: TestClient):
+    """
+    # Summary
+
+    Verify full management object is stored and returned on POST + GET.
+    """
+    test_name = inspect.currentframe().f_code.co_name
+    post_data = load_test_data("fabric.json", test_name)
+    management_sent = post_data["management"].copy()
+
+    response = client.post("/api/v1/manage/fabrics", json=post_data)
+    data = response.json()
+
+    assert response.status_code == 200
+    # bgpAsn is coerced to string
+    management_sent["bgpAsn"] = str(management_sent["bgpAsn"])
+    assert data["management"] == management_sent
+
+    response = client.get(f"/api/v1/manage/fabrics/{post_data['name']}")
+    data = response.json()
+
+    assert response.status_code == 200
+    assert data["management"] == management_sent
+
+
 def test_v1_fabric_get_100(session: Session, client: TestClient):
     """
     # Summary
@@ -114,7 +139,7 @@ def test_v1_fabric_get_100(session: Session, client: TestClient):
         -   location.longitude == expected longitude
     """
     f1 = FabricDbModel(
-        bgpAsn="65001",
+        management='{"bgpAsn": "65001", "type": "fabric"}',
         category="fabric",
         latitude=71.1,
         longitude=61.1,
@@ -125,10 +150,9 @@ def test_v1_fabric_get_100(session: Session, client: TestClient):
         telemetrySourceInterface="Ethernet1/1",
         telemetrySourceVrf="vrf_1",
         telemetryStreamingProtocol="ipv4",
-        type="fabric",
     )
     f2 = FabricDbModel(
-        bgpAsn="65002",
+        management='{"bgpAsn": "65002", "type": "fabric"}',
         category="fabric",
         latitude=72.2,
         longitude=62.2,
@@ -139,7 +163,6 @@ def test_v1_fabric_get_100(session: Session, client: TestClient):
         telemetrySourceInterface="Ethernet1/2",
         telemetrySourceVrf="vrf_2",
         telemetryStreamingProtocol="ipv6",
-        type="fabric",
     )
     session.add(f1)
     session.add(f2)
@@ -181,7 +204,7 @@ def test_v1_fabric_get_110(session: Session, client: TestClient):
         -   location.longitude == expected longitude
     """
     f1 = FabricDbModel(
-        bgpAsn="65001",
+        management='{"bgpAsn": "65001", "type": "fabric"}',
         category="fabric",
         name="f1",
         latitude=71.1,
@@ -192,7 +215,6 @@ def test_v1_fabric_get_110(session: Session, client: TestClient):
         telemetrySourceVrf="vrf_1",
         telemetrySourceInterface="Ethernet1/1",
         telemetryStreamingProtocol="ipv4",
-        type="fabric",
     )
     session.add(f1)
     session.commit()
@@ -224,7 +246,7 @@ def test_v1_fabric_put_100(session: Session, client: TestClient):
             e. telemetryStreamingProtocol is updated
     """
     f1 = FabricDbModel(
-        bgpAsn="65001",
+        management='{"bgpAsn": "65001", "type": "fabric"}',
         category="fabric",
         latitude=71.1,
         longitude=61.1,
@@ -235,7 +257,6 @@ def test_v1_fabric_put_100(session: Session, client: TestClient):
         telemetrySourceInterface="Ethernet1/1",
         telemetrySourceVrf="vrf_1",
         telemetryStreamingProtocol="ipv4",
-        type="fabric",
     )
     session.add(f1)
     session.commit()
@@ -286,7 +307,7 @@ def test_v1_fabric_delete_100(session: Session, client: TestClient):
     Verify that fabric is deleted with 204 status_code.
     """
     f1 = FabricDbModel(
-        bgpAsn="65001",
+        management='{"bgpAsn": "65001", "type": "fabric"}',
         category="fabric",
         latitude=60.1,
         longitude=60.1,
@@ -297,7 +318,6 @@ def test_v1_fabric_delete_100(session: Session, client: TestClient):
         telemetryCollectionType="inBand",
         telemetrySourceVrf="management",
         telemetrySourceInterface="Ethernet1/1",
-        type="fabric",
     )
     session.add(f1)
     session.commit()

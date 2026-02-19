@@ -1,9 +1,11 @@
+import json
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 
 from .....db import get_session
 from ....models.fabric import FabricDbModel, FabricResponseModel
-from .common import FabricLocationModel, FabricManagementModel
+from .common import FabricLocationModel
 
 router = APIRouter(
     prefix="/api/v1/manage",
@@ -20,17 +22,14 @@ def build_response(fabric: FabricDbModel) -> FabricResponseModel:
         latitude=fabric.latitude,
         longitude=fabric.longitude,
     )
-    management = FabricManagementModel(
-        bgpAsn=fabric.bgpAsn,
-        type=fabric.type,
-    )
+    management = json.loads(fabric.management)
     response: FabricResponseModel = FabricResponseModel(
         alertSuspend=fabric.alertSuspend,
         name=fabric.name,
         category=fabric.category,
         licenseTier=fabric.licenseTier,
         location=location.model_dump(),
-        management=management.model_dump(),
+        management=management,
         securityDomain=fabric.securityDomain,
         telemetryCollection=fabric.telemetryCollection,
         telemetryCollectionType=fabric.telemetryCollectionType,
@@ -53,8 +52,7 @@ def build_db_fabric(fabric):
     db_fabric.name = fabric.name
     db_fabric.category = fabric.category
     db_fabric.licenseTier = fabric.licenseTier
-    db_fabric.bgpAsn = fabric_dict.get("management", {}).get("bgpAsn")
-    db_fabric.type = fabric_dict.get("management", {}).get("type")
+    db_fabric.management = json.dumps(fabric_dict.get("management", {}))
     db_fabric.latitude = fabric_dict.get("location", {}).get("latitude")
     db_fabric.longitude = fabric_dict.get("location", {}).get("longitude")
     db_fabric.securityDomain = fabric.securityDomain

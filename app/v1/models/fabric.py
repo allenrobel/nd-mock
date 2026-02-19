@@ -7,7 +7,6 @@ from typing import List
 from pydantic import BaseModel, ConfigDict
 from sqlmodel import Field, SQLModel
 
-from ...common.validators.fabric import BgpValue
 from ..validators.fabric import FabricManagementType
 
 
@@ -82,18 +81,6 @@ class TelemetryStreamingProtocol(Enum):
     ipv6 = "ipv6"
 
 
-class FabricManagement(SQLModel):
-    """
-    Contents of the fabric management object.
-    TODO: Add remaining parameters per management type.
-    """
-
-    model_config = ConfigDict(coerce_numbers_to_str=True)
-
-    bgpAsn: str | int | None = None
-    type: str
-
-
 class FabricLocation(BaseModel):
     """
     Contents of the fabric location object.
@@ -132,7 +119,7 @@ class FabricResponseModel(SQLModel):
     category: str = Field(FabricCategoryEnum)
     licenseTier: str = Field(default="premier")
     location: dict = Field(FabricLocation)
-    management: FabricManagementType = Field(FabricManagement)
+    management: FabricManagementType
     name: str
     securityDomain: str | None = "all"
     telemetryCollection: bool = Field(default=False)
@@ -145,15 +132,12 @@ class FabricResponseModel(SQLModel):
 class FabricDbModel(SQLModel, table=True):
     """
     Representation of the fabric in the database.
-
-    TODO: Need to add remaining parameters.
     """
 
     model_config = ConfigDict(use_enum_values=True)
 
     alertSuspend: str = Field(default="disabled")
-    bgpAsn: BgpValue | None = Field(default=None)
-    type: str
+    management: str
     latitude: float
     longitude: float
     category: str = Field(FabricCategoryEnum)
