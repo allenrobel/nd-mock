@@ -103,6 +103,7 @@ Below, we run through a complete CRUD workflow for `/api/v1/infra/aaa/localUsers
 
 ``` bash
 (nd-mock) arobel@Allen-M4 nd-mock % bash examples/api-v1-infra-aaa-localUsers-DELETE.bash
+(nd-mock) arobel@Allen-M4 nd-mock % 
 # NOTE: No output for a DELETE request since it returns 204 No Content
 # Let's run the script again to verify the user is deleted.
 (nd-mock) arobel@Allen-M4 nd-mock % bash examples/api-v1-infra-aaa-localUsers-DELETE.bash
