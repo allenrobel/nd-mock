@@ -1,10 +1,10 @@
-# ndfc_mock - Containerized
+# nd-mock - Containerized
 
-ndfc_mock includes a Dockerfile to build a containerized instance.  This is
+nd-mock includes a Dockerfile to build a containerized instance.  This is
 tested with Podman, but Docker should also work (though I'm not using Docker
 so no guarantees).
 
-You can also run ndfc_mock outside of a container if you install the dependencies
+You can also run nd-mock outside of a container if you install the dependencies
 described in [Installation - No Container](./installation_no_container.md).
 
 ## Ansible Considerations
@@ -20,15 +20,15 @@ ansible_httpapi_port: 8080
 
 ## Installation
 
-To run ndfc_mock within a container, first install Podman or Docker.
-The examples below are using Podman.  Then clone the ndfc_mock
+To run nd-mock within a container, first install Podman or Docker.
+The examples below are using Podman.  Then clone the nd-mock
 repository and build the container.
 
 ```bash
-git clone https://github.com/allenrobel/ndfc_mock.git
-cd ndfc_mock
-podman build -t ndfc_mock .
-podman run --detach -p 8080:8080 ndfc_mock
+git clone https://github.com/allenrobel/nd-mock.git
+cd nd-mock
+podman build -t nd-mock .
+podman run --detach -p 8080:8080 nd-mock
 ```
 
 ## Uninstall - Container
@@ -50,7 +50,7 @@ podman rm randomly_assigned_container_name
 Then delete the image.
 
 ```bash
-podman rmi ndfc_mock
+podman rmi nd-mock
 ```
 
 ### Example
@@ -58,13 +58,13 @@ podman rmi ndfc_mock
 ```bash
 (py312) AROBEL-M-G793% podman ps
 CONTAINER ID  IMAGE                       COMMAND               CREATED         STATUS         PORTS                   NAMES
-6ef724456379  localhost/ndfc_mock:latest  fastapi run app/m...  19 minutes ago  Up 19 minutes  0.0.0.0:8080->8080/tcp  inspiring_villani
+6ef724456379  localhost/nd-mock:latest  fastapi run app/m...  19 minutes ago  Up 19 minutes  0.0.0.0:8080->8080/tcp  inspiring_villani
 (py312) AROBEL-M-G793% podman stop inspiring_villani
 inspiring_villani
 (py312) AROBEL-M-G793% podman rm inspiring_villani
 inspiring_villani
-(py312) AROBEL-M-G793% podman rmi ndfc_mock
-Untagged: localhost/ndfc_mock:latest
+(py312) AROBEL-M-G793% podman rmi nd-mock
+Untagged: localhost/nd-mock:latest
 Deleted: c4d64f101f97baa2a9ebe5984ffae3eab15f8477ee72817cea5ff499c1caa554
 Deleted: bbad8f9629050572ebdf128bb851d433ddc50d8585444fe380bba7c9170c72a5
 (py312) AROBEL-M-G793%

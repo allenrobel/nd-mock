@@ -1,6 +1,6 @@
-# ndfc_mock - No Container
+# nd-mock - No Container
 
-How to run ndfc_mock outside of a container.
+How to run nd-mock outside of a container.
 
 ## Ansible Considerations
 
@@ -22,8 +22,8 @@ this when running out-of-container, fastapi needs to be run one directory
 level above `app` (per the example below).
 
 ```bash
-git clone https://github.com/allenrobel/ndfc_mock.git
-cd ndfc_mock
+git clone https://github.com/allenrobel/nd-mock.git
+cd nd-mock
 uv sync
 fastapi run app/main.py
 # Comment out 'fastapi run main.py' above
