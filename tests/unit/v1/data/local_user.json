@@ -1,0 +1,54 @@
+{
+    "test_v1_local_user_post_100": {
+        "test_info": {
+            "testcase": "test_v1_local_user_post_100",
+            "description": [
+                "Local User POST API.",
+                "200 response valid request body."
+            ],
+            "tags": [
+                "local_user",
+                "post"
+            ]
+        },
+        "loginID": "testuser1",
+        "password": "dGVzdHBhc3N3b3JkMQ==",
+        "email": "testuser1@example.com",
+        "firstName": "Test",
+        "lastName": "User",
+        "passwordPolicy": {
+            "reuseLimitation": 3,
+            "timeIntervalLimitation": 24
+        },
+        "rbac": {
+            "domains": {
+                "all": {
+                    "roles": [
+                        "Admin"
+                    ]
+                }
+            },
+            "tenantDomain": ""
+        },
+        "remoteIDClaim": "",
+        "xLaunch": false
+    },
+    "test_v1_local_user_post_200": {
+        "test_info": {
+            "testcase": "test_v1_local_user_post_200",
+            "description": [
+                "Local User POST API.",
+                "500 response when duplicate user is created."
+            ],
+            "tags": [
+                "local_user",
+                "post"
+            ]
+        },
+        "loginID": "testuser1",
+        "password": "dGVzdHBhc3N3b3JkMQ==",
+        "email": "testuser1@example.com",
+        "firstName": "Test",
+        "lastName": "User"
+    }
+}

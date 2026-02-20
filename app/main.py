@@ -18,6 +18,11 @@ from .v1.endpoints.manage.fabrics.switches import switch_delete
 from .v1.endpoints.manage.fabrics.switches import switch_get
 from .v1.endpoints.manage.fabrics.switches import switches_get
 from .v1.endpoints.manage.fabrics.switches import switches_post
+from .v1.endpoints.aaa.local_users import local_user_delete
+from .v1.endpoints.aaa.local_users import local_user_get
+from .v1.endpoints.aaa.local_users import local_user_post
+from .v1.endpoints.aaa.local_users import local_user_put
+from .v1.endpoints.aaa.local_users import local_users_get
 
 app.include_router(login.router, tags=["Nexus Dashboard"])
 app.include_router(fabric_delete.router, tags=["Manage Fabrics"])
@@ -36,3 +41,8 @@ app.include_router(switches_post.router, tags=["Manage Switches"])
 app.include_router(switch_delete.router, tags=["Manage Switches"])
 app.include_router(change_roles_post.router, tags=["Manage Switch Actions"])
 app.include_router(rediscover_post.router, tags=["Manage Switch Actions"])
+app.include_router(local_user_delete.router, tags=["AAA Local Users"])
+app.include_router(local_user_get.router, tags=["AAA Local Users"])
+app.include_router(local_user_post.router, tags=["AAA Local Users"])
+app.include_router(local_user_put.router, tags=["AAA Local Users"])
+app.include_router(local_users_get.router, tags=["AAA Local Users"])
