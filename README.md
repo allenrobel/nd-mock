@@ -17,6 +17,8 @@ remove items from the database.
 
 ## [Supported Endpoints](./docs/supported_endpoints.md)
 
+## [Example curl Scripts](./docs/example_scripts.md)
+
 ## [Example Ansible Playbooks](./docs/example_playbooks.md)
 
 ## [Installation - Container](./docs/installation_container.md)
