@@ -129,6 +129,34 @@ class FabricResponseModel(SQLModel):
     telemetrySourceVrf: str | None = None
 
 
+class FabricSummaryBriefItem(BaseModel):
+    """
+    Response model for a single fabric in the fabricsSummaryBrief endpoint.
+    """
+
+    fabricName: str
+    securityDomain: str
+    featureUsage: dict[str, str]
+    featureStatus: dict[str, str] | None = None
+    licenseTier: str
+    alertSuspend: str | None = None
+    local: bool
+    ownerCluster: str
+    type: str
+    displayFabricType: str
+    location: FabricLocation
+    bgpAsn: str | None = None
+    tenantAssociation: bool | None = None
+
+
+class FabricsSummaryBriefResponse(BaseModel):
+    """
+    Wrapper response model for GET /fabricsSummaryBrief.
+    """
+
+    fabrics: List[FabricSummaryBriefItem]
+
+
 class FabricDbModel(SQLModel, table=True):
     """
     Representation of the fabric in the database.

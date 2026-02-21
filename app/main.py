@@ -9,6 +9,7 @@ from .v1.endpoints.manage.fabrics import fabric_get
 from .v1.endpoints.manage.fabrics import fabric_post
 from .v1.endpoints.manage.fabrics import fabric_put
 from .v1.endpoints.manage.fabrics import fabrics_get
+from .v1.endpoints.manage.fabrics import fabrics_summary_brief_get
 from .v1.endpoints.manage.fabrics.actions import config_deploy_post
 from .v1.endpoints.manage.fabrics.actions import config_save_post
 from .v1.endpoints.manage.fabrics.switch_actions import change_roles_post
@@ -30,6 +31,7 @@ app.include_router(fabric_get.router, tags=["Manage Fabrics"])
 app.include_router(fabric_post.router, tags=["Manage Fabrics"])
 app.include_router(fabric_put.router, tags=["Manage Fabrics"])
 app.include_router(fabrics_get.router, tags=["Manage Fabrics"])
+app.include_router(fabrics_summary_brief_get.router, tags=["Manage Fabrics"])
 app.include_router(config_deploy_post.router, tags=["Manage Fabric Actions"])
 app.include_router(config_save_post.router, tags=["Manage Fabric Actions"])
 app.include_router(credentials_switches_get.router, tags=["Manage Credentials"])
