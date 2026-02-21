@@ -18,6 +18,7 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 from app.v1.models.fabric import FabricDbModel, FabricResponseModel
+from app.v1.models.switch import SwitchDbModel
 from ..common import client_fixture, convert_db_date_to_timestamp, convert_model_date_to_timestamp, session_fixture, timestamps_within_delta
 from .data_loader import load_data
 
@@ -348,4 +349,99 @@ def test_v1_fabric_delete_110(session: Session, client: TestClient):
     assert response_decode["detail"]["description"] == ""
     assert response_decode["detail"]["message"] == "Fabric foo not found"
 
+    assert fabric_in_db is None
+
+
+def test_v1_fabric_delete_120(session: Session, client: TestClient):
+    """
+    # Summary
+
+    Attempt to delete a fabric that has switches.
+
+    Verify the response is 500 and the fabric still exists.
+    """
+    f1 = FabricDbModel(
+        management='{"bgpAsn": "65001", "type": "vxlanIbgp"}',
+        category="fabric",
+        latitude=60.1,
+        longitude=60.1,
+        licenseTier="advantage",
+        name="f1",
+        securityDomain="all",
+        telemetryStreamingProtocol="ipv6",
+        telemetryCollectionType="inBand",
+        telemetrySourceVrf="management",
+        telemetrySourceInterface="Ethernet1/1",
+    )
+    session.add(f1)
+    session.commit()
+
+    switch = SwitchDbModel(
+        switchId="SAL1111",
+        fabricName="f1",
+        fabricManagementIp="10.1.1.1",
+        hostname="leaf1",
+        model="N9K-C93180YC-FX",
+        serialNumber="SAL1111",
+        softwareVersion="10.3(3)",
+        switchRole="leaf",
+    )
+    session.add(switch)
+    session.commit()
+
+    response = client.delete("/api/v1/manage/fabrics/f1")
+    response_decode = response.json()
+
+    assert response.status_code == 500
+    assert response_decode["detail"]["code"] == 500
+    assert "Cannot delete fabric f1" in response_decode["detail"]["message"]
+
+    fabric_in_db = session.get(FabricDbModel, "f1")
+    assert fabric_in_db is not None
+
+
+def test_v1_fabric_delete_130(session: Session, client: TestClient):
+    """
+    # Summary
+
+    Delete switches first, then delete fabric.
+
+    Verify the fabric can be deleted after its switches are removed.
+    """
+    f1 = FabricDbModel(
+        management='{"bgpAsn": "65001", "type": "vxlanIbgp"}',
+        category="fabric",
+        latitude=60.1,
+        longitude=60.1,
+        licenseTier="advantage",
+        name="f1",
+        securityDomain="all",
+        telemetryStreamingProtocol="ipv6",
+        telemetryCollectionType="inBand",
+        telemetrySourceVrf="management",
+        telemetrySourceInterface="Ethernet1/1",
+    )
+    session.add(f1)
+    session.commit()
+
+    switch = SwitchDbModel(
+        switchId="SAL1111",
+        fabricName="f1",
+        fabricManagementIp="10.1.1.1",
+        hostname="leaf1",
+        model="N9K-C93180YC-FX",
+        serialNumber="SAL1111",
+        softwareVersion="10.3(3)",
+        switchRole="leaf",
+    )
+    session.add(switch)
+    session.commit()
+
+    response = client.delete("/api/v1/manage/fabrics/f1/switches/SAL1111")
+    assert response.status_code == 204
+
+    response = client.delete("/api/v1/manage/fabrics/f1")
+    assert response.status_code == 204
+
+    fabric_in_db = session.get(FabricDbModel, "f1")
     assert fabric_in_db is None
