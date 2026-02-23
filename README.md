@@ -15,9 +15,13 @@ POST and PUT requests update an in-memory SQLlite database;
 GET requests retrieve from this database; and DELETE requests
 remove items from the database.
 
+## Getting Started
+
+Please refer to the Installation links at the bottom of this README.
+
 ## Initial Performance
 
-For a workflow below, mock ND is about 1,127x faster than real ND.
+For the workflow below, mock ND is about 1,127x faster than real ND.
 
 1. Login
 2. Create three fabrics of different types
