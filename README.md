@@ -120,6 +120,7 @@ Total                                       0.0334s
 This work would not be possible without the following.
 
 1. [FastApi](https://fastapi.tiangolo.com)
-2. [SQLModel](https://sqlmodel.tiangolo.com)
+2. [Podman](https://podman.io)
 3. [Pydantic](https://docs.pydantic.dev/latest/)
-4. [Podman](https://podman.io)
+4. [SQLAlchemy (SQLite)](https://www.sqlalchemy.org)
+5. [SQLModel](https://sqlmodel.tiangolo.com)
