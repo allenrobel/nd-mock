@@ -1,5 +1,7 @@
 # Example curl Scripts
 
+A growing list of examples `curl` scripts is available in `./examples/*.bash`
+
 ## Usage examples
 
 Below, we run through a complete CRUD workflow for `/api/v1/infra/aaa/localUsers`
