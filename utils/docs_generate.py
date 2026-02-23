@@ -6,7 +6,7 @@ Retrieve all endpoints from an OpenAPI schema and format them for
 use in the README.md file.
 """
 import json
-from os import environ
+from pathlib import Path
 from typing import Any
 
 import requests
@@ -78,9 +78,8 @@ def write_endpoints_to_markdown(lines: list) -> None:
 
     Write the endpoints to a markdown file.
     """
-    home = environ["HOME"]
-    repo = f"{home}/repos/podman/nd-mock"
-    filename = f"{repo}/docs/supported_endpoints.md"
+    repo_root = Path(__file__).resolve().parent.parent
+    filename = str(repo_root / "docs" / "supported_endpoints.md")
 
     if lines[-1] == "" and lines[-2] == "":
         lines.pop()

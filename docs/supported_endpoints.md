@@ -1,5 +1,12 @@
 # Supported Endpoints
 
+
+## Nexus Dashboard
+
+- `/login`
+  - `post`
+    - Login Post
+
 ## Manage Fabrics
 
 - `/api/v1/manage/fabrics/{fabric_name}`
@@ -22,15 +29,19 @@
   - `get`
     - Fabrics Get
 
-## Manage Fabric Actions
+- `/api/v1/manage/fabricsSummaryBrief`
+  - `get`
+    - Fabrics Summary Brief Get
 
-- `/api/v1/manage/fabrics/{fabric_name}/actions/configSave`
-  - `post`
-    - Config Save Post
+## Manage Fabric Actions
 
 - `/api/v1/manage/fabrics/{fabric_name}/actions/configDeploy`
   - `post`
     - Config Deploy Post
+
+- `/api/v1/manage/fabrics/{fabric_name}/actions/configSave`
+  - `post`
+    - Config Save Post
 
 ## Manage Credentials
 
@@ -44,38 +55,54 @@
 
 ## Manage Switches
 
-- `/api/v1/manage/fabrics/{fabric_name}/switches`
+- `/api/v1/manage/fabrics/{fabric_name}/switches/summary`
   - `get`
-    - Switches Get
+    - Switches Summary Get
 
 - `/api/v1/manage/fabrics/{fabric_name}/switches/{switch_id}`
   - `get`
     - Switch Get
 
-- `/api/v1/manage/fabrics/{fabric_name}/switches`
-  - `post`
-    - Switches Post
-
 - `/api/v1/manage/fabrics/{fabric_name}/switches/{switch_id}`
   - `delete`
     - Switch Delete
 
-- `/api/v1/manage/fabrics/{fabric_name}/switches/summary`
+- `/api/v1/manage/fabrics/{fabric_name}/switches`
   - `get`
-    - Switches Summary Get
+    - Switches Get
+
+- `/api/v1/manage/fabrics/{fabric_name}/switches`
+  - `post`
+    - Switches Post
 
 ## Manage Switch Actions
 
 - `/api/v1/manage/fabrics/{fabric_name}/switchActions/changeRoles`
   - `post`
-    - Change Roles Post
+    - Switch Change Roles Post
 
 - `/api/v1/manage/fabrics/{fabric_name}/switchActions/rediscover`
   - `post`
-    - Rediscover Post
+    - Switch Rediscover Post
 
-## Nexus Dashboard
+## AAA Local Users
 
-- `/login`
+- `/api/v1/infra/aaa/localUsers/{pathLoginId}`
+  - `delete`
+    - Local User Delete
+
+- `/api/v1/infra/aaa/localUsers/{pathLoginId}`
+  - `get`
+    - Local User Get
+
+- `/api/v1/infra/aaa/localUsers/{pathLoginId}`
+  - `put`
+    - Local User Put
+
+- `/api/v1/infra/aaa/localUsers`
+  - `get`
+    - Local Users Get
+
+- `/api/v1/infra/aaa/localUsers`
   - `post`
-    - Login Post
+    - Local User Post
