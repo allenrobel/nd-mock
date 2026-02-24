@@ -34,7 +34,7 @@ So I let it install this.
 5. More recently (as of 2026-02-23) I explored giving Claude access to
 a real Nexus Dashboard instance (in my case a virtual ND + n9000v switches
 running on a server in my home) and allowed him to send DELETE, GET, POST, PUT
-requests as he sees fit, has allowed him to learn real response structures for
+requests as he sees fit.  This allowed him to learn real response structures for
 both success and failure scenarios and to apply this learning to the mock server.
 This worked surprisingly well.
 
