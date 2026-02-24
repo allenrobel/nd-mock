@@ -94,7 +94,8 @@ def switch_role_db_to_external(role: str) -> str:
     return_role = db_to_external_role.get(role)
     if not return_role:
         msg = f"Invalid role: {role}."
-        raise HTTPException(status_code=500, detail=msg)
+        detail = {"code": 500, "description": "", "errors": None, "message": msg}
+        raise HTTPException(status_code=500, detail=detail)
     return return_role
 
 
@@ -119,5 +120,6 @@ def switch_role_external_to_db(role: str) -> str:
     return_role = external_role_to_db.get(role)
     if not return_role:
         msg = f"Invalid role: {role}."
-        raise HTTPException(status_code=500, detail=msg)
+        detail = {"code": 500, "description": "", "errors": None, "message": msg}
+        raise HTTPException(status_code=500, detail=detail)
     return return_role

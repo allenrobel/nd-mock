@@ -28,5 +28,5 @@ def credentials_switches_post(*, session: Session = Depends(get_session), body: 
         session.commit()
     except Exception as error:
         session.rollback()
-        raise HTTPException(status_code=500, detail={"code": 500, "description": "", "message": f"Failed to save credentials: {error}"}) from error
+        raise HTTPException(status_code=500, detail={"code": 500, "description": "", "errors": None, "message": f"Failed to save credentials: {error}"}) from error
     return {}

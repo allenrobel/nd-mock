@@ -14,5 +14,6 @@ router = APIRouter(
 def local_user_get(*, session: Session = Depends(get_session), pathLoginId: str):
     user = session.get(LocalUserDbModel, pathLoginId)
     if not user:
-        raise HTTPException(status_code=404, detail=f"User {pathLoginId} not found")
+        detail = {"code": 404, "description": "", "errors": None, "message": f"User {pathLoginId} not found"}
+        raise HTTPException(status_code=404, detail=detail)
     return build_response(user).model_dump()

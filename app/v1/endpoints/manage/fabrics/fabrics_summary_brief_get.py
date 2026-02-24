@@ -5,7 +5,6 @@ from sqlmodel import Session, select
 
 from .....db import get_session
 from ....models.fabric import FabricDbModel, FabricLocation, FabricSummaryBriefItem, FabricsSummaryBriefResponse
-from .constants import DISPLAY_FABRIC_TYPE_MAP
 
 MOCK_CLUSTER_NAME = "nd-mock-cluster"
 
@@ -29,8 +28,6 @@ def build_summary_brief(fabric: FabricDbModel) -> FabricSummaryBriefItem:
         longitude=fabric.longitude,
     )
 
-    display_type = DISPLAY_FABRIC_TYPE_MAP.get(mgmt_type, mgmt_type)
-
     return FabricSummaryBriefItem(
         fabricName=fabric.name,
         securityDomain=fabric.securityDomain or "all",
@@ -41,7 +38,7 @@ def build_summary_brief(fabric: FabricDbModel) -> FabricSummaryBriefItem:
         local=True,
         ownerCluster=MOCK_CLUSTER_NAME,
         type=mgmt_type,
-        displayFabricType=display_type,
+        displayFabricType=mgmt_type,
         location=location,
         bgpAsn=bgp_asn,
         # TODO: When VRF/Network models are added, query those tables to determine tenantAssociation dynamically.

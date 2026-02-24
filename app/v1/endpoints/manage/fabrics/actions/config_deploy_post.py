@@ -26,6 +26,6 @@ def config_deploy_post(
 ):
     db_fabric = session.get(FabricDbModel, fabric_name)
     if not db_fabric:
-        detail = {"code": 404, "description": "", "message": f"Fabric {fabric_name} not found"}
+        detail = {"code": 404, "description": "", "errors": None, "message": f"Fabric {fabric_name} not found"}
         raise HTTPException(status_code=404, detail=detail)
     return ConfigDeployResponseModel(status="Configuration deployment completed").model_dump()

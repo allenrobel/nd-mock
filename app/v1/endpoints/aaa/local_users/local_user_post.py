@@ -63,7 +63,7 @@ async def local_user_post(*, session: Session = Depends(get_session), user: Loca
     if db_user:
         status_code = 500
         msg = f"User {user.loginID} already exists"
-        error_response = {"code": status_code, "description": "", "message": msg}
+        error_response = {"code": status_code, "description": "", "errors": None, "message": msg}
         raise HTTPException(status_code=status_code, detail=error_response)
     db_user = build_db_user(user)
     session.add(db_user)
@@ -73,7 +73,7 @@ async def local_user_post(*, session: Session = Depends(get_session), user: Loca
         session.rollback()
         status_code = 500
         msg = f"Unknown error. Detail: {error}"
-        error_response = {"code": status_code, "description": "", "message": msg}
+        error_response = {"code": status_code, "description": "", "errors": None, "message": msg}
         raise HTTPException(status_code=status_code, detail=error_response) from error
     session.refresh(db_user)
     return build_response(db_user)

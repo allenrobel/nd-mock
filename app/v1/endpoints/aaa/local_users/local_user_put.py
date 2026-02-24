@@ -16,7 +16,8 @@ router = APIRouter(
 def local_user_put(*, session: Session = Depends(get_session), pathLoginId: str, user: LocalUserPutModel):
     db_user = session.get(LocalUserDbModel, pathLoginId)
     if not db_user:
-        raise HTTPException(status_code=404, detail=f"User {pathLoginId} not found")
+        detail = {"code": 404, "description": "", "errors": None, "message": f"User {pathLoginId} not found"}
+        raise HTTPException(status_code=404, detail=detail)
     user_data = user.model_dump(exclude_unset=True)
 
     for key, value in user_data.items():

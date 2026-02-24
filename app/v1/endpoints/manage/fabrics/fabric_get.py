@@ -52,6 +52,7 @@ def fabric_get(*, session: Session = Depends(get_session), fabric_name: str):
     """
     fabric = session.get(FabricDbModel, fabric_name)
     if not fabric:
-        raise HTTPException(status_code=404, detail=f"Fabric {fabric_name} not found")
+        detail = {"code": 404, "description": "", "errors": None, "message": f"Fabric {fabric_name} not found"}
+        raise HTTPException(status_code=404, detail=detail)
     response = build_response(fabric)
     return response.model_dump()
