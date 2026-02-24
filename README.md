@@ -23,9 +23,20 @@ agents are at building a mock of Nexus Dashboard.
 
 ## Strategy
 
-I'm actually letting Claude interact with a real Nexus Dashboard instance
-(in my case a virtual ND + n9000v switches running on a server in my home).
-It's also furthering my experience using AI agents to build software.
+1. I've provided Claude with the schemas for the new Nexus Dashboard REST API.
+From these schema's Claude is writing Pydantic models for payloads, responses,
+etc.
+2. Claude suggested that I install an MCP server that knows about FastAPI,
+Pydantic, and SQLAlchemy so that it has the latest information about these libraries.
+So I let it install this.
+3. Claude suggested a number of skills that would be helpful to him in his daily work and I accepted these as well.
+4. I wrote docs/nd-object-hierarchy.md and had Claude review it and use it as a basis for 
+5. More recently (as of 2026-02-23) I explored giving Claude access to
+a real Nexus Dashboard instance (in my case a virtual ND + n9000v switches
+running on a server in my home) and allowed him to send DELETE, GET, POST, PUT
+requests as he sees fit, has allowed him to learn real response structures for
+both success and failure scenarios and to apply this learning to the mock server.
+This worked surprisingly well.
 
 ## Goal
 
