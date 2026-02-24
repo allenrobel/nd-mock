@@ -1,19 +1,45 @@
 # Summary
 
-This is a work in progress with limited functionality as described
-below.
+This repository contains a mock REST server that mimicks Nexus Dashboard (ND)
+version 4.2.
+
+The idea is to be able to run a lightweight API-only (no GUI) ND instance on
+a laptop to support devOps work on a plane, coffee shop, etc.
+
+Specifically, in my case, it'll help me (and hopefully others) write Ansible
+modules for ND 4.2.
+
+## Background
+
+About a year ago I wrote an initial mock Nexus Dashboard 3.x REST API server
+manually using Python and some popular libraries (FastAPI, SQLModel, and SQLAlchemy).
+Now that Cisco is releasing version ND 4.2 with a new API, I decided to start
+from scratch and leverage Claude Code exclusively to write the implementation
+for Nexus Dashboard version 4.2.  While I've been providing minimal guidance
+(architecture, tech stack, etc), Claude is writing all the code.
+
+Hence, this is a training and proving ground for me to see how adept Claude
+agents are at building a mock of Nexus Dashboard.
+
+## Strategy
+
+I'm actually letting Claude interact with a real Nexus Dashboard instance
+(in my case a virtual ND + n9000v switches running on a server in my home).
+It's also furthering my experience using AI agents to build software.
+
+## Goal
 
 When finished, this will allow for minor development and testing of
 [ansible-nd](https://github.com/CiscoDevNet/ansible-nd)
 modules (and other REST API-based applications) without requiring a
-real Nexus Dashboard (ND) instance.
+real Nexus Dashboard (ND) instance or even any switches (virtual or
+otherwise).
 
-Basically, it will accept GET/POST/PUT/DELETE requests to
-endpoints supported by ND and will return responses that
-align, as closely as possible, with real ND responses i.e.,
-POST and PUT requests update an in-memory SQLlite database;
-GET requests retrieve from this database; and DELETE requests
-remove items from the database.
+Basically, the mock server will accept GET/POST/PUT/DELETE requests to
+endpoints supported by ND and will return responses that align, as closely
+as possible, with real ND responses i.e., POST and PUT requests update an
+in-memory SQLite database; GET requests retrieve from this database;
+and DELETE requests remove items from the database.
 
 ## Getting Started
 
