@@ -27,12 +27,13 @@ agents are at building a mock of Nexus Dashboard.
 From these schema's Claude is writing Pydantic models for payloads, responses,
 etc.
 2. Claude suggested that I install an MCP server that knows about FastAPI,
-Pydantic, and SQLAlchemy so that it has the latest information about these
-libraries. So I let it install this.
+Pydantic, and SQLAlchemy so that he is able to reference the latest information
+about these libraries. So I let it install this.
 3. Claude suggested a number of skills that would be helpful to him in his daily work
 and I accepted these as well.
 4. I wrote docs/nd-object-hierarchy.md and had Claude review it and use it as a basis for
-estimation of object constraints.
+estimation of object constraints (fabric groups, fabrics, VRFs, networks, switches,
+interfaces, etc).  For example, a fabric that contains switches cannot be deleted.
 5. More recently (as of 2026-02-23) I gave Claude access to a real Nexus Dashboard
 instance (in my case a virtual ND + n9000v switches running on a server in my home)
 and allowed him to send DELETE, GET, POST, PUT requests as he sees fit.  This
@@ -42,7 +43,7 @@ well!
 
 ## Goal
 
-When finished, this will allow for minor development and testing of
+When finished, `nd-mock` will allow for minor development and testing of
 [ansible-nd](https://github.com/CiscoDevNet/ansible-nd)
 modules (and other REST API-based applications) without requiring a
 real Nexus Dashboard (ND) instance or even any switches (virtual or
@@ -50,7 +51,7 @@ otherwise).
 
 Basically, the mock server will accept GET/POST/PUT/DELETE requests to
 endpoints supported by ND and will return responses that align, as closely
-as possible, with real ND responses.  Modifications are persisted in a 
+as possible, with real ND responses.  Modifications are persisted in a
 SQLite database i.e., POST and PUT requests update the database; GET
 requests retrieve from the database; and DELETE requests remove items
 from the database.
@@ -72,7 +73,7 @@ For the workflow below, mock ND is about 1,127x faster than real ND.
 7. Delete all remaining fabrics
 8. List all fabrics
 
-Why so fast?  While the nd-mock server persists state, it does not have to calculate
+Why so fast?  While the `nd-mock` server persists state, it does not have to calculate
 switch configurations and push these to actual switches.  It also does not have
 to write to a highly redundant database like `etcd`.  There are several other
 overheads that are necessary when running a production service like Nexus Dashboard
