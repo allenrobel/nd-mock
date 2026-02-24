@@ -50,6 +50,18 @@ utils/            # Utility scripts (docs_generate.py)
 3. Import the endpoint in `app/main.py` and register with `app.include_router()`
 4. Add tests in `tests/unit/`
 
-## ND API Behavior Reference
+## ND API Reference
 
-See [docs/nd-api-behavior.md](docs/nd-api-behavior.md) for real Nexus Dashboard API behavior discovered by probing a live ND 4.2 instance. Consult this document when implementing new endpoints to ensure mock fidelity.
+### Object Model
+
+- [docs/nd-object-hierarchy.md](docs/nd-object-hierarchy.md) — Nexus Dashboard object hierarchy, relationships, and constraints (Fabric Group > Fabric > VRF > Network > Switch > Interface)
+
+### API Behavior (Real ND 4.2 Observed Behavior)
+
+Reference these documents when implementing mock endpoints to ensure fidelity with real ND. Each file covers standard error format, HTTP status codes, and object-specific behaviors:
+
+- [docs/nd-api-behavior-fabric.md](docs/nd-api-behavior-fabric.md) — Fabric operations (create, delete, list)
+- [docs/nd-api-behavior-switch.md](docs/nd-api-behavior-switch.md) — Switch operations (add, discover, role changes)
+- [docs/nd-api-behavior-vrf.md](docs/nd-api-behavior-vrf.md) — VRF operations (create, attach/detach, query)
+- [docs/nd-api-behavior-network.md](docs/nd-api-behavior-network.md) — Network operations (coming soon)
+- [docs/nd-api-behavior-interface.md](docs/nd-api-behavior-interface.md) — Interface operations (coming soon)
