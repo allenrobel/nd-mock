@@ -3,8 +3,8 @@
 This repository contains a mock REST server that mimicks Nexus Dashboard (ND)
 version 4.2.
 
-The idea is to be able to run a lightweight API-only (no GUI) ND instance on
-a laptop to support devOps work on a plane, coffee shop, etc.
+The idea is to be able to run a lightweight local API-only (no GUI) ND instance
+on a laptop to support devOps work on a plane, in a coffee shop, etc.
 
 Specifically, in my case, it'll help me (and hopefully others) write Ansible
 modules for ND 4.2.
@@ -16,7 +16,7 @@ manually using Python and some popular libraries (FastAPI, SQLModel, and SQLAlch
 Now that Cisco is releasing version ND 4.2 with a new API, I decided to start
 from scratch and leverage Claude Code exclusively to write the implementation
 for Nexus Dashboard version 4.2.  While I've been providing minimal guidance
-(architecture, tech stack, etc), Claude is writing all the code.
+to Claude (architecture, tech stack, etc), Claude is writing all the code.
 
 Hence, this is a training and proving ground for me to see how adept Claude
 agents are at building a mock of Nexus Dashboard.
@@ -27,16 +27,18 @@ agents are at building a mock of Nexus Dashboard.
 From these schema's Claude is writing Pydantic models for payloads, responses,
 etc.
 2. Claude suggested that I install an MCP server that knows about FastAPI,
-Pydantic, and SQLAlchemy so that it has the latest information about these libraries.
-So I let it install this.
-3. Claude suggested a number of skills that would be helpful to him in his daily work and I accepted these as well.
-4. I wrote docs/nd-object-hierarchy.md and had Claude review it and use it as a basis for 
-5. More recently (as of 2026-02-23) I explored giving Claude access to
-a real Nexus Dashboard instance (in my case a virtual ND + n9000v switches
-running on a server in my home) and allowed him to send DELETE, GET, POST, PUT
-requests as he sees fit.  This allowed him to learn real response structures for
-both success and failure scenarios and to apply this learning to the mock server.
-This worked surprisingly well.
+Pydantic, and SQLAlchemy so that it has the latest information about these
+libraries. So I let it install this.
+3. Claude suggested a number of skills that would be helpful to him in his daily work
+and I accepted these as well.
+4. I wrote docs/nd-object-hierarchy.md and had Claude review it and use it as a basis for
+estimation of object constraints.
+5. More recently (as of 2026-02-23) I gave Claude access to a real Nexus Dashboard
+instance (in my case a virtual ND + n9000v switches running on a server in my home)
+and allowed him to send DELETE, GET, POST, PUT requests as he sees fit.  This
+allowed him to learn real response structures for both success and failure
+scenarios and to apply this learning to the mock server. This worked surprisingly
+well!
 
 ## Goal
 
@@ -48,9 +50,10 @@ otherwise).
 
 Basically, the mock server will accept GET/POST/PUT/DELETE requests to
 endpoints supported by ND and will return responses that align, as closely
-as possible, with real ND responses i.e., POST and PUT requests update an
-in-memory SQLite database; GET requests retrieve from this database;
-and DELETE requests remove items from the database.
+as possible, with real ND responses.  Modifications are persisted in a 
+SQLite database i.e., POST and PUT requests update the database; GET
+requests retrieve from the database; and DELETE requests remove items
+from the database.
 
 ## Getting Started
 
@@ -68,6 +71,12 @@ For the workflow below, mock ND is about 1,127x faster than real ND.
 6. List all fabrics
 7. Delete all remaining fabrics
 8. List all fabrics
+
+Why so fast?  While the nd-mock server persists state, it does not have to calculate
+switch configurations and push these to actual switches.  It also does not have
+to write to a highly redundant database like `etcd`.  There are several other
+overheads that are necessary when running a production service like Nexus Dashboard
+that a mock server can simply ignore.
 
 ### Real ND
 
