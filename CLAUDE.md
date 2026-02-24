@@ -49,3 +49,7 @@ utils/            # Utility scripts (docs_generate.py)
 2. Create corresponding models in `app/v1/models/`
 3. Import the endpoint in `app/main.py` and register with `app.include_router()`
 4. Add tests in `tests/unit/`
+
+## ND API Behavior Reference
+
+See [docs/nd-api-behavior.md](docs/nd-api-behavior.md) for real Nexus Dashboard API behavior discovered by probing a live ND 4.2 instance. Consult this document when implementing new endpoints to ensure mock fidelity.
