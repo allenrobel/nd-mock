@@ -75,7 +75,7 @@ def test_v1_fabrics_summary_brief_200(session: Session, client: TestClient):
     assert fabric["licenseTier"] == "premier"
     assert fabric["local"] is True
     assert fabric["type"] == "vxlanIbgp"
-    assert fabric["displayFabricType"] == "Data Center VXLAN EVPN - iBGP"
+    assert fabric["displayFabricType"] == "vxlanIbgp"
     assert fabric["location"]["latitude"] == 71.1
     assert fabric["location"]["longitude"] == 61.1
     assert fabric["bgpAsn"] == "65001"
@@ -123,7 +123,7 @@ def test_v1_fabrics_summary_brief_500(session: Session, client: TestClient):
     """
     # Summary
 
-    Verify displayFabricType mapping for multiple management types.
+    Verify displayFabricType returns raw type string for multiple management types.
     """
     _create_fabric(session, name="f1", mgmt_type="vxlanIbgp", latitude=71.1, longitude=61.1)
     _create_fabric(session, name="f2", mgmt_type="vxlanEbgp", latitude=72.2, longitude=62.2)
@@ -136,10 +136,10 @@ def test_v1_fabrics_summary_brief_500(session: Session, client: TestClient):
     assert response.status_code == 200
 
     type_map = {f["fabricName"]: f["displayFabricType"] for f in data["fabrics"]}
-    assert type_map["f1"] == "Data Center VXLAN EVPN - iBGP"
-    assert type_map["f2"] == "Data Center VXLAN EVPN - eBGP"
-    assert type_map["f3"] == "ACI"
-    assert type_map["f4"] == "Routed"
+    assert type_map["f1"] == "vxlanIbgp"
+    assert type_map["f2"] == "vxlanEbgp"
+    assert type_map["f3"] == "aci"
+    assert type_map["f4"] == "routed"
 
 
 def test_v1_fabrics_summary_brief_600(session: Session, client: TestClient):

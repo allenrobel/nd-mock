@@ -19,7 +19,7 @@ def switches_post(
 ):
     db_fabric = session.get(FabricDbModel, fabric_name)
     if not db_fabric:
-        detail = {"code": 404, "description": "", "message": f"Fabric {fabric_name} not found"}
+        detail = {"code": 404, "description": "", "errors": None, "message": f"Fabric {fabric_name} not found"}
         raise HTTPException(status_code=404, detail=detail)
 
     for switch in body.switches:
@@ -38,5 +38,5 @@ def switches_post(
         session.commit()
     except Exception as error:
         session.rollback()
-        raise HTTPException(status_code=500, detail={"code": 500, "description": "", "message": f"Failed to add switches: {error}"}) from error
+        raise HTTPException(status_code=500, detail={"code": 500, "description": "", "errors": None, "message": f"Failed to add switches: {error}"}) from error
     return {}

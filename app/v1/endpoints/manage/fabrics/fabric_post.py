@@ -73,14 +73,9 @@ async def fabric_post(*, session: Session = Depends(get_session), fabric: Fabric
     """
     db_fabric = session.get(FabricDbModel, fabric.name)
     if db_fabric:
-        status_code = 500
-        msg = f"[Fabric {db_fabric.name} is already present in the cluster "
-        msg += f"A fabric with name {db_fabric.name} is already in use on "
-        msg += "this cluster]"
-        error_response = {}
-        error_response["code"] = status_code
-        error_response["description"] = ""
-        error_response["message"] = msg
+        status_code = 400
+        msg = f"[Fabric named {db_fabric.name} is already present in the cluster: nd-mock-cluster]"
+        error_response = {"code": status_code, "description": "", "errors": None, "message": msg}
         raise HTTPException(status_code=status_code, detail=error_response)
     db_fabric = build_db_fabric(fabric)
     session.add(db_fabric)
@@ -90,12 +85,10 @@ async def fabric_post(*, session: Session = Depends(get_session), fabric: Fabric
         session.rollback()
         status_code = 500
         msg = f"Unknown error. Detail: {error}"
-        error_response = {}
-        error_response["code"] = status_code
-        error_response["description"] = ""
-        error_response["message"] = msg
+        error_response = {"code": status_code, "description": "", "errors": None, "message": msg}
         raise HTTPException(status_code=status_code, detail=error_response) from error
     session.refresh(db_fabric)
     if db_fabric is None:
-        raise HTTPException(status_code=500, detail="Failed to create fabric")
+        detail = {"code": 500, "description": "", "errors": None, "message": "Failed to create fabric"}
+        raise HTTPException(status_code=500, detail=detail)
     return build_response(db_fabric)

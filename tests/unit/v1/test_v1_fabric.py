@@ -347,6 +347,7 @@ def test_v1_fabric_delete_110(session: Session, client: TestClient):
     assert response.status_code == 404
     assert response_decode["detail"]["code"] == 404
     assert response_decode["detail"]["description"] == ""
+    assert response_decode["detail"]["errors"] is None
     assert response_decode["detail"]["message"] == "Fabric foo not found"
 
     assert fabric_in_db is None
@@ -358,7 +359,7 @@ def test_v1_fabric_delete_120(session: Session, client: TestClient):
 
     Attempt to delete a fabric that has switches.
 
-    Verify the response is 500 and the fabric still exists.
+    Verify the response is 400 and the fabric still exists.
     """
     f1 = FabricDbModel(
         management='{"bgpAsn": "65001", "type": "vxlanIbgp"}',
@@ -392,9 +393,10 @@ def test_v1_fabric_delete_120(session: Session, client: TestClient):
     response = client.delete("/api/v1/manage/fabrics/f1")
     response_decode = response.json()
 
-    assert response.status_code == 500
-    assert response_decode["detail"]["code"] == 500
-    assert "Cannot delete fabric f1" in response_decode["detail"]["message"]
+    assert response.status_code == 400
+    assert response_decode["detail"]["code"] == 400
+    assert response_decode["detail"]["errors"] is None
+    assert response_decode["detail"]["message"] == "Unable to delete Fabric f1.  Please remove all switches in this fabric before deleting."
 
     fabric_in_db = session.get(FabricDbModel, "f1")
     assert fabric_in_db is not None

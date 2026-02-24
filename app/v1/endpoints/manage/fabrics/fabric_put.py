@@ -88,7 +88,8 @@ def fabric_put(
     """
     db_fabric = session.get(FabricDbModel, fabric_name)
     if not db_fabric:
-        raise HTTPException(status_code=404, detail=f"Fabric {fabric_name} not found")
+        detail = {"code": 404, "description": "", "errors": None, "message": f"Fabric {fabric_name} not found"}
+        raise HTTPException(status_code=404, detail=detail)
     fabric_data = fabric.model_dump(exclude_unset=True)
 
     for key, value in fabric_data.items():

@@ -97,11 +97,15 @@ class CounterNameValue(BaseModel):
     count: int
 
 
+class CountersWrapper(BaseModel):
+    counters: List[CounterNameValue] = []
+
+
 class SwitchesSummaryResponse(BaseModel):
-    anomalyLevel: List[CounterNameValue] = []
-    configSyncStatus: List[CounterNameValue] = []
-    role: List[CounterNameValue] = []
-    softwareVersion: List[CounterNameValue] = []
+    anomalyLevel: CountersWrapper = CountersWrapper()
+    configSyncStatus: CountersWrapper = CountersWrapper()
+    role: CountersWrapper = CountersWrapper()
+    softwareVersion: CountersWrapper = CountersWrapper()
 
 
 class SwitchDbModel(SQLModel, table=True):

@@ -19,12 +19,12 @@ def switch_rediscover_post(
 ):
     db_fabric = session.get(FabricDbModel, fabric_name)
     if not db_fabric:
-        detail = {"code": 404, "description": "", "message": f"Fabric {fabric_name} not found"}
+        detail = {"code": 404, "description": "", "errors": None, "message": f"Fabric {fabric_name} not found"}
         raise HTTPException(status_code=404, detail=detail)
 
     for switch_id in body.switchIds:
         db_switch = session.get(SwitchDbModel, switch_id)
         if not db_switch or db_switch.fabricName != fabric_name:
-            detail = {"code": 404, "description": "", "message": f"Switch {switch_id} not found in fabric {fabric_name}"}
+            detail = {"code": 404, "description": "", "errors": None, "message": f"Switch {switch_id} not found in fabric {fabric_name}"}
             raise HTTPException(status_code=404, detail=detail)
     return {}

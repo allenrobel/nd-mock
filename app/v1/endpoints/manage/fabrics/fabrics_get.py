@@ -61,7 +61,8 @@ def fabrics_get(
         total = session.exec(select(func.count()).select_from(FabricDbModel)).one()
         fabrics = session.exec(select(FabricDbModel).offset(offset).limit(limit)).all()
     except Exception as error:
-        raise HTTPException(status_code=500, detail=str(error)) from error
+        detail = {"code": 500, "description": "", "errors": None, "message": str(error)}
+        raise HTTPException(status_code=500, detail=detail) from error
     response = []
     response_fabric: dict[Any, Any] = {}
     try:
@@ -69,7 +70,8 @@ def fabrics_get(
             response_fabric = FabricResponseModel.model_dump(build_response(fabric))
             response.append(copy.deepcopy(response_fabric))
     except Exception as error:
-        raise HTTPException(status_code=500, detail=str(error)) from error
+        detail = {"code": 500, "description": "", "errors": None, "message": str(error)}
+        raise HTTPException(status_code=500, detail=detail) from error
     remaining = max(0, total - offset - len(response))
     meta = FabricsListMeta(total=total, remaining=remaining)
     return FabricsListResponse(fabrics=response, meta=meta)

@@ -17,7 +17,8 @@ def local_users_get(*, session: Session = Depends(get_session)) -> LocalUsersLis
     try:
         users = session.exec(select(LocalUserDbModel)).all()
     except Exception as error:
-        raise HTTPException(status_code=500, detail=str(error)) from error
+        detail = {"code": 500, "description": "", "errors": None, "message": str(error)}
+        raise HTTPException(status_code=500, detail=detail) from error
     response = []
     for user in users:
         response.append(copy.deepcopy(build_response(user).model_dump()))

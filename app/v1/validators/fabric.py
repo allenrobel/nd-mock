@@ -16,14 +16,16 @@ def validate_fabric_management(fabric_management: dict) -> dict:
     bgp_asn = fabric_management.get("bgpAsn")
     if bgp_asn is None and mgmt_type in MANAGEMENT_TYPES_REQUIRING_BGP:
         msg = "management.bgpAsn is missing"
-        raise HTTPException(status_code=500, detail=msg)
+        detail = {"code": 500, "description": "", "errors": None, "message": msg}
+        raise HTTPException(status_code=500, detail=detail)
     if bgp_asn is not None:
         bgp_asn = str(bgp_asn)
         try:
             validate_bgp_asn(bgp_asn=bgp_asn)
         except ValueError as error:
             msg = "Error in validating provided name value pair: [bgpAsn]"
-            raise HTTPException(status_code=500, detail=msg) from error
+            detail = {"code": 500, "description": "", "errors": None, "message": msg}
+            raise HTTPException(status_code=500, detail=detail) from error
         fabric_management["bgpAsn"] = bgp_asn
     return fabric_management
 

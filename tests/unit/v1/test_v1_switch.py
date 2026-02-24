@@ -136,7 +136,7 @@ def test_v1_switches_summary_100(session: Session, client: TestClient):
     data = response.json()
 
     assert response.status_code == 200
-    roles = {item["name"]: item["count"] for item in data["role"]}
+    roles = {item["name"]: item["count"] for item in data["role"]["counters"]}
     assert roles["leaf"] == 1
     assert roles["spine"] == 1
 

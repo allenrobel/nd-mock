@@ -18,7 +18,7 @@ def switch_get(
 ):
     db_switch = session.get(SwitchDbModel, switch_id)
     if not db_switch or db_switch.fabricName != fabric_name:
-        detail = {"code": 404, "description": "", "message": f"Switch {switch_id} not found in fabric {fabric_name}"}
+        detail = {"code": 404, "description": "", "errors": None, "message": f"Switch {switch_id} not found in fabric {fabric_name}"}
         raise HTTPException(status_code=404, detail=detail)
     return SwitchDataResponse(
         switchId=db_switch.switchId,
