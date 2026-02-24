@@ -85,6 +85,26 @@
   - `post`
     - Switch Rediscover Post
 
+## Manage VRFs
+
+- `/api/v1/manage/fabrics/{fabric_name}/vrfs/{vrf_name}`
+  - `delete`
+    - Vrf Delete
+
+- `/api/v1/manage/fabrics/{fabric_name}/vrfs`
+  - `get`
+    - Vrfs Get
+
+- `/api/v1/manage/fabrics/{fabric_name}/vrfs`
+  - `post`
+    - Vrfs Post
+
+## Manage VRF Attachments
+
+- `/api/v1/manage/fabrics/{fabric_name}/vrfAttachments/query`
+  - `post`
+    - Vrf Attachments Query
+
 ## AAA Local Users
 
 - `/api/v1/infra/aaa/localUsers/{pathLoginId}`
