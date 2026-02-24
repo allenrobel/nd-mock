@@ -20,4 +20,4 @@ curl -X 'POST' \
   "password": "MySuperSecretCredentials",
   "platformType": "nx-os",
   "preserveConfig": false
-}'
+}'  | python -m json.tool
