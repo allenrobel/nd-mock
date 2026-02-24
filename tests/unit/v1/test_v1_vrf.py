@@ -384,3 +384,150 @@ def test_v1_vrf_attachment_query_210(session: Session, client: TestClient):
     assert len(data["attachments"]) == 1
     assert data["attachments"][0]["status"] == "notApplicable"
     assert data["attachments"][0]["attach"] is False
+
+
+# ---------------------------------------------------------------------------
+# POST /fabrics/{fabricName}/vrfActions/deploy
+# ---------------------------------------------------------------------------
+
+
+def test_v1_vrf_deploy_100(session: Session, client: TestClient):
+    """Verify deploy transitions attach=True pending attachment to 'attached'."""
+    _create_fabric(session)
+    _create_switch(session)
+    _create_vrf(session)
+    _create_vrf_attachment(session, status="pending", attach=True)
+
+    response = client.post("/api/v1/manage/fabrics/f1/vrfActions/deploy", json={"switchIds": [], "vrfNames": []})
+    assert response.status_code == 200
+    assert response.json()["status"] == "Configuration deployment completed"
+
+    # Verify the attachment transitioned to "attached"
+    body = {"switchIds": ["SAL1111"], "vrfNames": ["MyVRF_50000"]}
+    query_response = client.post("/api/v1/manage/fabrics/f1/vrfAttachments/query", json=body)
+    att = query_response.json()["attachments"][0]
+    assert att["status"] == "attached"
+    assert att["attach"] is True
+
+
+def test_v1_vrf_deploy_110(session: Session, client: TestClient):
+    """Verify deploy transitions attach=False pending attachment to 'notApplicable'."""
+    _create_fabric(session)
+    _create_switch(session)
+    _create_vrf(session)
+    _create_vrf_attachment(session, status="pending", attach=False)
+
+    response = client.post("/api/v1/manage/fabrics/f1/vrfActions/deploy", json={"switchIds": [], "vrfNames": []})
+    assert response.status_code == 200
+
+    body = {"switchIds": ["SAL1111"], "vrfNames": ["MyVRF_50000"]}
+    query_response = client.post("/api/v1/manage/fabrics/f1/vrfAttachments/query", json=body)
+    att = query_response.json()["attachments"][0]
+    assert att["status"] == "notApplicable"
+    assert att["attach"] is False
+
+
+def test_v1_vrf_deploy_120(session: Session, client: TestClient):
+    """Verify deploy handles multiple pending attachments with mixed attach flags."""
+    _create_fabric(session)
+    _create_switch(session, switch_id="SAL1111", hostname="leaf1")
+    _create_switch(session, switch_id="SAL2222", hostname="leaf2")
+    _create_vrf(session, vrf_name="VRF_A", vrf_id=50001)
+    _create_vrf(session, vrf_name="VRF_B", vrf_id=50002)
+    _create_vrf_attachment(session, vrf_name="VRF_A", switch_id="SAL1111", status="pending", attach=True)
+    _create_vrf_attachment(session, vrf_name="VRF_B", switch_id="SAL2222", status="pending", attach=False)
+
+    response = client.post("/api/v1/manage/fabrics/f1/vrfActions/deploy", json={"switchIds": [], "vrfNames": []})
+    assert response.status_code == 200
+
+    # Check VRF_A on SAL1111 -> attached
+    body = {"switchIds": ["SAL1111"], "vrfNames": ["VRF_A"]}
+    q = client.post("/api/v1/manage/fabrics/f1/vrfAttachments/query", json=body)
+    assert q.json()["attachments"][0]["status"] == "attached"
+
+    # Check VRF_B on SAL2222 -> notApplicable
+    body = {"switchIds": ["SAL2222"], "vrfNames": ["VRF_B"]}
+    q = client.post("/api/v1/manage/fabrics/f1/vrfAttachments/query", json=body)
+    assert q.json()["attachments"][0]["status"] == "notApplicable"
+
+
+def test_v1_vrf_deploy_130(session: Session, client: TestClient):
+    """Verify deploy with vrfNames filter only transitions matching VRFs."""
+    _create_fabric(session)
+    _create_switch(session)
+    _create_vrf(session, vrf_name="VRF_A", vrf_id=50001)
+    _create_vrf(session, vrf_name="VRF_B", vrf_id=50002)
+    _create_vrf_attachment(session, vrf_name="VRF_A", switch_id="SAL1111", status="pending", attach=True)
+    _create_vrf_attachment(session, vrf_name="VRF_B", switch_id="SAL1111", status="pending", attach=True)
+
+    # Deploy only VRF_A
+    response = client.post("/api/v1/manage/fabrics/f1/vrfActions/deploy", json={"switchIds": [], "vrfNames": ["VRF_A"]})
+    assert response.status_code == 200
+
+    # VRF_A should be attached
+    body = {"switchIds": ["SAL1111"], "vrfNames": ["VRF_A"]}
+    q = client.post("/api/v1/manage/fabrics/f1/vrfAttachments/query", json=body)
+    assert q.json()["attachments"][0]["status"] == "attached"
+
+    # VRF_B should still be pending
+    body = {"switchIds": ["SAL1111"], "vrfNames": ["VRF_B"]}
+    q = client.post("/api/v1/manage/fabrics/f1/vrfAttachments/query", json=body)
+    assert q.json()["attachments"][0]["status"] == "pending"
+
+
+def test_v1_vrf_deploy_140(session: Session, client: TestClient):
+    """Verify deploy with switchIds filter only transitions matching switches."""
+    _create_fabric(session)
+    _create_switch(session, switch_id="SAL1111", hostname="leaf1")
+    _create_switch(session, switch_id="SAL2222", hostname="leaf2")
+    _create_vrf(session)
+    _create_vrf_attachment(session, switch_id="SAL1111", status="pending", attach=True)
+    _create_vrf_attachment(session, switch_id="SAL2222", status="pending", attach=True)
+
+    # Deploy only SAL1111
+    response = client.post("/api/v1/manage/fabrics/f1/vrfActions/deploy", json={"switchIds": ["SAL1111"], "vrfNames": []})
+    assert response.status_code == 200
+
+    # SAL1111 should be attached
+    body = {"switchIds": ["SAL1111"], "vrfNames": ["MyVRF_50000"]}
+    q = client.post("/api/v1/manage/fabrics/f1/vrfAttachments/query", json=body)
+    assert q.json()["attachments"][0]["status"] == "attached"
+
+    # SAL2222 should still be pending
+    body = {"switchIds": ["SAL2222"], "vrfNames": ["MyVRF_50000"]}
+    q = client.post("/api/v1/manage/fabrics/f1/vrfAttachments/query", json=body)
+    assert q.json()["attachments"][0]["status"] == "pending"
+
+
+def test_v1_vrf_deploy_200(client: TestClient):
+    """Verify deploy returns 404 for nonexistent fabric."""
+    response = client.post("/api/v1/manage/fabrics/nonexistent/vrfActions/deploy", json={"switchIds": [], "vrfNames": []})
+    data = response.json()
+
+    assert response.status_code == 404
+    assert data["detail"]["code"] == 404
+    assert data["detail"]["message"] == "Fabric nonexistent not found"
+
+
+def test_v1_vrf_deploy_300(session: Session, client: TestClient):
+    """Verify deploy with no pending attachments returns success (no-op)."""
+    _create_fabric(session)
+
+    response = client.post("/api/v1/manage/fabrics/f1/vrfActions/deploy", json={"switchIds": [], "vrfNames": []})
+    assert response.status_code == 200
+    assert response.json()["status"] == "Configuration deployment completed"
+
+
+def test_v1_vrf_deploy_310(session: Session, client: TestClient):
+    """Verify deploy does not alter non-pending attachments."""
+    _create_fabric(session)
+    _create_switch(session)
+    _create_vrf(session)
+    _create_vrf_attachment(session, status="attached", attach=True)
+
+    response = client.post("/api/v1/manage/fabrics/f1/vrfActions/deploy", json={"switchIds": [], "vrfNames": []})
+    assert response.status_code == 200
+
+    body = {"switchIds": ["SAL1111"], "vrfNames": ["MyVRF_50000"]}
+    q = client.post("/api/v1/manage/fabrics/f1/vrfAttachments/query", json=body)
+    assert q.json()["attachments"][0]["status"] == "attached"
