@@ -19,6 +19,10 @@ from .v1.endpoints.manage.fabrics.switches import switch_delete
 from .v1.endpoints.manage.fabrics.switches import switch_get
 from .v1.endpoints.manage.fabrics.switches import switches_get
 from .v1.endpoints.manage.fabrics.switches import switches_post
+from .v1.endpoints.manage.fabrics.vrf_attachments import query_post as vrf_attachments_query_post
+from .v1.endpoints.manage.fabrics.vrfs import vrf_delete
+from .v1.endpoints.manage.fabrics.vrfs import vrfs_get
+from .v1.endpoints.manage.fabrics.vrfs import vrfs_post
 from .v1.endpoints.aaa.local_users import local_user_delete
 from .v1.endpoints.aaa.local_users import local_user_get
 from .v1.endpoints.aaa.local_users import local_user_post
@@ -43,6 +47,10 @@ app.include_router(switches_post.router, tags=["Manage Switches"])
 app.include_router(switch_delete.router, tags=["Manage Switches"])
 app.include_router(change_roles_post.router, tags=["Manage Switch Actions"])
 app.include_router(rediscover_post.router, tags=["Manage Switch Actions"])
+app.include_router(vrf_delete.router, tags=["Manage VRFs"])
+app.include_router(vrfs_get.router, tags=["Manage VRFs"])
+app.include_router(vrfs_post.router, tags=["Manage VRFs"])
+app.include_router(vrf_attachments_query_post.router, tags=["Manage VRF Attachments"])
 app.include_router(local_user_delete.router, tags=["AAA Local Users"])
 app.include_router(local_user_get.router, tags=["AAA Local Users"])
 app.include_router(local_user_post.router, tags=["AAA Local Users"])
