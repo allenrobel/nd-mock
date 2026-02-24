@@ -23,6 +23,11 @@ def switches_post(
         raise HTTPException(status_code=404, detail=detail)
 
     for switch in body.switches:
+        existing = session.get(SwitchDbModel, switch.serialNumber)
+        if existing:
+            detail = {"code": 400, "description": "", "errors": None, "message": f"Switch with serial number {switch.serialNumber} already exists in fabric {existing.fabricName}"}
+            raise HTTPException(status_code=400, detail=detail)
+
         db_switch = SwitchDbModel(
             switchId=switch.serialNumber,
             fabricName=fabric_name,
