@@ -29,11 +29,11 @@ utils/            # Utility scripts (docs_generate.py)
 
 ## Commands
 
-- **Run server**: `uvicorn app.main:app --reload`
-- **Run all tests**: `pytest`
-- **Run unit tests**: `pytest tests/unit/`
-- **Run integration tests**: `pytest tests/integration/`
-- **Type checking**: `mypy app/`
+- **Run server**: `uv run uvicorn app.main:app --reload`
+- **Run all tests**: `uv run pytest`
+- **Run unit tests**: `uv run pytest tests/unit`
+- **Run integration tests**: `uv run pytest tests/integration/`
+- **Type checking**: `uv run mypy app/`
 
 ## Code Style
 
