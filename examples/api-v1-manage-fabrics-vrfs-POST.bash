@@ -62,5 +62,5 @@ curl -s -X POST http://localhost:8000/api/v1/manage/fabrics/fabric1/vrfs \
       "vlanId": 2000
     }
   ]
-}' | python -m json.tool
+}' | (python -m json.tool 2>/dev/null || true)
 
