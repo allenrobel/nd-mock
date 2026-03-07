@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from ..models.login import LoginResponseModel
 
 router = APIRouter(
-    prefix="",
+    prefix="/api/v1/infra",
 )
 
 

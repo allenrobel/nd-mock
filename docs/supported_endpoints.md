@@ -3,7 +3,7 @@
 
 ## Nexus Dashboard
 
-- `/login`
+- `/api/v1/infra/login`
   - `post`
     - Login Post
 
@@ -98,6 +98,12 @@
 - `/api/v1/manage/fabrics/{fabric_name}/vrfs`
   - `post`
     - Vrfs Post
+
+## Manage VRF Actions
+
+- `/api/v1/manage/fabrics/{fabric_name}/vrfActions/deploy`
+  - `post`
+    - Vrf Deploy Post
 
 ## Manage VRF Attachments
 
