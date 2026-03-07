@@ -45,7 +45,7 @@ the uvicorn site.
 
 - Note: Running outside of a container will result in database.db being created in the ./app directory.
 - Note: When starting with `fastapi dev main.py` the last two lines will not
-  contain the ouput shown above, since debugging output will appear after these
+  contain the output shown above, since debugging output will appear after these
   lines. In this case, scroll back up about 25 or so lines to view:
 
 ```bash
