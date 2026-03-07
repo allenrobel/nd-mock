@@ -147,7 +147,7 @@ config: dict[str, str] = {"username": USERNAME, "password": PASSWORD, "domain": 
 
 @timed("1. Login")
 def step_login(session, base_url):
-    url = f"{base_url}/login"
+    url = f"{base_url}/api/v1/infra/login"
     body = {"domain": config["domain"], "userName": config["username"], "userPasswd": config["password"]}
     resp = session.post(url, json=body)
     resp.raise_for_status()
