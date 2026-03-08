@@ -6,7 +6,7 @@ from sqlmodel import Session
 
 from ......db import get_session
 from .....models.fabric import FabricDbModel
-from .....models.vrf import VrfCreateRequestBody, VrfCreateResponse, VrfCreateResultItem, VrfDbModel
+from .....models.vrf import VRF_TYPES, VrfCreateRequestBody, VrfCreateResponse, VrfCreateResultItem, VrfDbModel
 
 router = APIRouter(
     prefix="/api/v1/manage/fabrics",
@@ -35,8 +35,17 @@ def vrfs_post(
         detail = {"code": 500, "description": "", "errors": None, "message": f"Invalid Fabric name: {fabric_name}"}
         raise HTTPException(status_code=500, detail=detail)
 
+    valid_types_str = ", ".join(sorted(VRF_TYPES))
     results = []
     for vrf_item in body.vrfs:
+        if not vrf_item.vrfType:
+            results.append(VrfCreateResultItem(status="failed", message="vrfType is mandatory", vrfName=vrf_item.vrfName, vrfId=vrf_item.vrfId or 0))
+            continue
+
+        if vrf_item.vrfType not in VRF_TYPES:
+            results.append(VrfCreateResultItem(status="failed", message=f"Invalid vrfType: '{vrf_item.vrfType}'. Valid types are: {valid_types_str}", vrfName=vrf_item.vrfName, vrfId=vrf_item.vrfId or 0))
+            continue
+
         synthetic_id = f"{fabric_name}:{vrf_item.vrfName}"
         existing = session.get(VrfDbModel, synthetic_id)
         if existing:

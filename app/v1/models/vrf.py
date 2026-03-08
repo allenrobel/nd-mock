@@ -1,6 +1,8 @@
 # mypy: disable-error-code=call-arg
 from typing import Any, Dict, List, Optional
 
+VRF_TYPES = frozenset(["vxlan", "vxlanIbgp", "vxlanEbgp", "vxlanCampus", "aimlVxlanIbgp", "aimlVxlanEbgp", "classicLanEnhanced", "userDefined", "vxlanAci", "aci", "externalConnectivity", "vxlanExternal"])
+
 from pydantic import BaseModel, ConfigDict
 from sqlmodel import Field, SQLModel
 

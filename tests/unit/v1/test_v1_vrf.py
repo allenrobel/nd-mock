@@ -102,7 +102,7 @@ def _create_vrf_attachment(
 def test_v1_vrf_post_100(session: Session, client: TestClient):
     """Verify single VRF creation returns 207 with success status."""
     _create_fabric(session)
-    body = {"vrfs": [{"vrfName": "MyVRF_50000", "vrfId": 50000, "vlanId": 2000}]}
+    body = {"vrfs": [{"vrfName": "MyVRF_50000", "vrfId": 50000, "vlanId": 2000, "vrfType": "vxlanEbgp"}]}
     response = client.post("/api/v1/manage/fabrics/f1/vrfs", json=body)
     data = response.json()
 
@@ -118,8 +118,8 @@ def test_v1_vrf_post_110(session: Session, client: TestClient):
     _create_fabric(session)
     body = {
         "vrfs": [
-            {"vrfName": "VRF_A", "vrfId": 50001},
-            {"vrfName": "VRF_B", "vrfId": 50002},
+            {"vrfName": "VRF_A", "vrfId": 50001, "vrfType": "vxlanIbgp"},
+            {"vrfName": "VRF_B", "vrfId": 50002, "vrfType": "vxlanEbgp"},
         ]
     }
     response = client.post("/api/v1/manage/fabrics/f1/vrfs", json=body)
@@ -132,12 +132,37 @@ def test_v1_vrf_post_110(session: Session, client: TestClient):
     assert names == {"VRF_A", "VRF_B"}
 
 
+def test_v1_vrf_post_120(session: Session, client: TestClient):
+    """Verify missing vrfType returns 207 with per-item failed status."""
+    _create_fabric(session)
+    body = {"vrfs": [{"vrfName": "MyVRF_50000", "vrfId": 50000}]}
+    response = client.post("/api/v1/manage/fabrics/f1/vrfs", json=body)
+    data = response.json()
+
+    assert response.status_code == 207
+    assert data["results"][0]["status"] == "failed"
+    assert data["results"][0]["message"] == "vrfType is mandatory"
+
+
+def test_v1_vrf_post_130(session: Session, client: TestClient):
+    """Verify invalid vrfType returns 207 with per-item failed status."""
+    _create_fabric(session)
+    body = {"vrfs": [{"vrfName": "MyVRF_50000", "vrfId": 50000, "vrfType": "bogus"}]}
+    response = client.post("/api/v1/manage/fabrics/f1/vrfs", json=body)
+    data = response.json()
+
+    assert response.status_code == 207
+    assert data["results"][0]["status"] == "failed"
+    assert "Invalid vrfType: 'bogus'" in data["results"][0]["message"]
+    assert "Valid types are:" in data["results"][0]["message"]
+
+
 def test_v1_vrf_post_200(session: Session, client: TestClient):
     """Verify duplicate VRF returns 207 with failed status."""
     _create_fabric(session)
     _create_vrf(session)
 
-    body = {"vrfs": [{"vrfName": "MyVRF_50000", "vrfId": 50000}]}
+    body = {"vrfs": [{"vrfName": "MyVRF_50000", "vrfId": 50000, "vrfType": "vxlanEbgp"}]}
     response = client.post("/api/v1/manage/fabrics/f1/vrfs", json=body)
     data = response.json()
 
@@ -148,7 +173,7 @@ def test_v1_vrf_post_200(session: Session, client: TestClient):
 
 def test_v1_vrf_post_300(client: TestClient):
     """Verify VRF creation in nonexistent fabric returns 500."""
-    body = {"vrfs": [{"vrfName": "MyVRF_50000", "vrfId": 50000}]}
+    body = {"vrfs": [{"vrfName": "MyVRF_50000", "vrfId": 50000, "vrfType": "vxlanEbgp"}]}
     response = client.post("/api/v1/manage/fabrics/nonexistent/vrfs", json=body)
     data = response.json()
 
