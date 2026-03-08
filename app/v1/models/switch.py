@@ -64,9 +64,12 @@ class SwitchDiscoveryItem(BaseModel):
 
 class AddSwitchesRequestBody(BaseModel):
     switches: List[SwitchDiscoveryItem]
+    username: Optional[str] = None
     password: Optional[str] = None
     platformType: Optional[str] = "nx-os"
     preserveConfig: Optional[bool] = True
+    snmpV3AuthProtocol: Optional[str] = None
+    useCredentialForWrite: Optional[bool] = None
 
 
 class SwitchRoleData(BaseModel):

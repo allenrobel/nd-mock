@@ -17,6 +17,14 @@ def switches_post(
     fabric_name: str,
     body: AddSwitchesRequestBody,
 ):
+    if not body.username:
+        detail = {"code": 0, "description": "", "message": "username cannot be empty or missing"}
+        raise HTTPException(status_code=400, detail=detail)
+
+    if not body.snmpV3AuthProtocol:
+        detail = {"code": 0, "description": "", "message": "snmpV3AuthProtocol cannot be empty or missing"}
+        raise HTTPException(status_code=400, detail=detail)
+
     db_fabric = session.get(FabricDbModel, fabric_name)
     if not db_fabric:
         detail = {"code": 404, "description": "", "errors": None, "message": f"Fabric {fabric_name} not found"}

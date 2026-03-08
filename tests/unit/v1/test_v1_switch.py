@@ -53,7 +53,10 @@ def test_v1_switches_post_100(session: Session, client: TestClient):
         "switches": [
             {"hostname": "leaf1", "ip": "10.1.1.1", "serialNumber": "SAL1111", "model": "N9K-C93180YC-FX"},
             {"hostname": "spine1", "ip": "10.1.1.2", "serialNumber": "SAL2222", "model": "N9K-C9336C-FX2"},
-        ]
+        ],
+        "username": "admin",
+        "password": "mysecret",
+        "snmpV3AuthProtocol": "MD5",
     }
     response = client.post("/api/v1/manage/fabrics/f1/switches", json=body)
     assert response.status_code == 202
@@ -61,9 +64,37 @@ def test_v1_switches_post_100(session: Session, client: TestClient):
 
 def test_v1_switches_post_200(client: TestClient):
     """Verify switch POST returns 404 for non-existent fabric."""
-    body = {"switches": [{"hostname": "leaf1", "ip": "10.1.1.1", "serialNumber": "SAL1111", "model": "N9K"}]}
+    body = {
+        "switches": [{"hostname": "leaf1", "ip": "10.1.1.1", "serialNumber": "SAL1111", "model": "N9K"}],
+        "username": "admin",
+        "snmpV3AuthProtocol": "MD5",
+    }
     response = client.post("/api/v1/manage/fabrics/nonexistent/switches", json=body)
     assert response.status_code == 404
+
+
+def test_v1_switches_post_300(session: Session, client: TestClient):
+    """Verify switch POST returns 400 when username is missing."""
+    _create_fabric(session)
+    body = {
+        "switches": [{"hostname": "leaf1", "ip": "10.1.1.1", "serialNumber": "SAL1111", "model": "N9K"}],
+        "snmpV3AuthProtocol": "MD5",
+    }
+    response = client.post("/api/v1/manage/fabrics/f1/switches", json=body)
+    assert response.status_code == 400
+    assert response.json()["detail"]["message"] == "username cannot be empty or missing"
+
+
+def test_v1_switches_post_400(session: Session, client: TestClient):
+    """Verify switch POST returns 400 when snmpV3AuthProtocol is missing."""
+    _create_fabric(session)
+    body = {
+        "switches": [{"hostname": "leaf1", "ip": "10.1.1.1", "serialNumber": "SAL1111", "model": "N9K"}],
+        "username": "admin",
+    }
+    response = client.post("/api/v1/manage/fabrics/f1/switches", json=body)
+    assert response.status_code == 400
+    assert response.json()["detail"]["message"] == "snmpV3AuthProtocol cannot be empty or missing"
 
 
 def test_v1_switches_get_100(session: Session, client: TestClient):
