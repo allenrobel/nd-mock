@@ -3,6 +3,13 @@
     "context7": {
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp@latest"]
+    },
+    "nd-openapi": {
+      "command": "uv",
+      "args": ["run", ".claude/mcp-servers/nd-openapi/server.py"],
+      "env": {
+        "ND_SCHEMA_DIR": "schema"
+      }
     }
   }
 }
