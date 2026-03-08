@@ -11,8 +11,7 @@
       "url": "https://www.cisco.com/site/us/en/about/legal/contract-experience/index.html"
     },
     "title": "Nexus Dashboard Infrastructure v1",
-    "version": "1.1.114",
-    "x-nd-server-ignore": true
+    "version": "1.1.132"
   },
   "servers": [
     {
@@ -720,7 +719,7 @@
                         "domains": {
                           "all": {
                             "roles": [
-                              "Observer"
+                              "observer"
                             ]
                           }
                         },
@@ -795,10 +794,11 @@
                   "domains": {
                     "all": {
                       "roles": [
-                        "Observer"
+                        "observer"
                       ]
                     }
-                  }
+                  },
+                  "tenantDomain": "DevOpsTenantDomain"
                 },
                 "remoteIDClaim": "",
                 "xLaunch": false
@@ -828,7 +828,7 @@
                     "domains": {
                       "all": {
                         "roles": [
-                          "Observer"
+                          "observer"
                         ]
                       }
                     },
@@ -965,7 +965,7 @@
                     "domains": {
                       "all": {
                         "roles": [
-                          "Observer"
+                          "observer"
                         ]
                       }
                     },
@@ -1053,7 +1053,7 @@
                   "domains": {
                     "all": {
                       "roles": [
-                        "Observer"
+                        "observer"
                       ]
                     }
                   },
@@ -1087,7 +1087,7 @@
                     "domains": {
                       "all": {
                         "roles": [
-                          "Observer"
+                          "observer"
                         ]
                       }
                     },
@@ -1715,7 +1715,7 @@
                         "domains": {
                           "all": {
                             "roles": [
-                              "Observer"
+                              "observer"
                             ]
                           }
                         },
@@ -1798,7 +1798,7 @@
                     "domains": {
                       "all": {
                         "roles": [
-                          "Observer"
+                          "observer"
                         ]
                       }
                     },
@@ -2770,7 +2770,7 @@
     },
     "/about": {
       "get": {
-        "description": "Returns Nexus Dashboard system information including version and pre-login banner (unauthenticated).\nThis endpoint is typically used by the login page to display version and banner information.\n",
+        "description": "Returns Nexus Dashboard system information including version and pre-login banner.\nThis is a public endpoint that does not require authentication.\n\nTypically used by the login page to display version and banner information before\nthe user logs in.\n\nExample - Get system information:\n\n```bash\ncurl -sk https://<ND_IP>/api/v1/infra/about\n```\n",
         "operationId": "getAbout",
         "parameters": [
           {
@@ -4184,11 +4184,20 @@
     },
     "/changePassword": {
       "post": {
-        "description": "Change the password for the currently logged-in local user.\nIt requires valid session token (JWT) to derive the username.\n",
+        "description": "Change the password for the currently logged-in local user.\nRequires authentication via the AuthCookie cookie.\n\nThe username is derived from the JWT token claims - it cannot be specified in the\nrequest body. Use this endpoint when the user is already logged in and wants to\nchange their password proactively.\n\nImportant restrictions:\n- Only works for local users. Remote users (LDAP, RADIUS, TACACS, OIDC) must\n  change their password through their respective identity provider.\n- The JWT token must have been issued by the same cluster (cross-cluster tokens\n  are rejected).\n- The old password must be verified before allowing the change.\n\nNote: If you are not logged in and need to change an expired password, use\n/updatePassword instead (no authentication required).\n\nExample - Change password for the currently logged-in user:\n\n```bash\ncurl -sk -X POST https://<ND_IP>/api/v1/infra/changePassword \\\n  -H \"Content-Type: application/json\" \\\n  -b \"AuthCookie=$TOKEN\" \\\n  -d '{\"userPasswd\":\"currentpassword\",\"newPasswd\":\"newpassword\"}'\n```\n",
         "operationId": "executePasswordChange",
         "parameters": [
           {
             "$ref": "#/components/parameters/fromClusterQueryParam"
+          },
+          {
+            "description": "Session JWT token passed as a cookie. Required to identify the user.\nThe username is extracted from the JWT claims.\n",
+            "in": "cookie",
+            "name": "AuthCookie",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
@@ -4248,19 +4257,6 @@
               }
             },
             "description": "Unauthorized"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "New password must be different from old password."
-                },
-                "schema": {
-                  "$ref": "#/components/schemas/errorResponse"
-                }
-              }
-            },
-            "description": "Unprocessable Entity"
           },
           "500": {
             "content": {
@@ -4343,8 +4339,7 @@
                   "externalServiceStatusList": [
                     {
                       "allocatedIp": "192.0.0.200",
-                      "description": "Telemetry collector-1",
-                      "name": "cisco-nir-collectorpersistent1-service",
+                      "name": "Telemetry collector-1",
                       "service": "cisco-nir/flow-collector"
                     }
                   ],
@@ -5138,8 +5133,7 @@
                   "externalServiceStatusList": [
                     {
                       "allocatedIp": "192.0.0.200",
-                      "description": "Telemetry collector-1",
-                      "name": "cisco-nir-collectorpersistent1-service",
+                      "name": "Telemetry collector-1",
                       "service": "cisco-nir/flow-collector"
                     }
                   ],
@@ -7128,6 +7122,7 @@
             ]
           }
         ],
+        "summary": "Browse application objects",
         "tags": [
           "Integrations"
         ]
@@ -7226,6 +7221,7 @@
             ]
           }
         ],
+        "summary": "Get application details",
         "tags": [
           "Integrations"
         ]
@@ -7325,6 +7321,7 @@
             ]
           }
         ],
+        "summary": "Get AppDynamics top entities",
         "tags": [
           "Integrations"
         ]
@@ -7395,6 +7392,7 @@
             ]
           }
         ],
+        "summary": "Get application topology",
         "tags": [
           "Integrations"
         ]
@@ -11839,6 +11837,7 @@
             ]
           }
         ],
+        "summary": "Delete an existing slackapp integration",
         "tags": [
           "Integrations"
         ]
@@ -11888,13 +11887,14 @@
             ]
           }
         ],
+        "summary": "Get detail of a slackapp integration",
         "tags": [
           "Integrations"
         ]
       },
       "put": {
         "description": "Update an existing slackapp integration",
-        "operationId": "executeSlackappIntegrationModify",
+        "operationId": "updateSlackappIntegration",
         "parameters": [
           {
             "$ref": "#/components/parameters/fromClusterQueryParam"
@@ -11950,6 +11950,7 @@
             ]
           }
         ],
+        "summary": "Update an existing slackapp integration",
         "tags": [
           "Integrations"
         ]
@@ -14196,7 +14197,7 @@
         ]
       },
       "post": {
-        "description": "Authenticate user with credentials and return a valid JWT authentication token.\nSupports multiple authentication realms: Local, LDAP, RADIUS, TACACS, OIDC,\nMicrosoft Entra ID, and MultiClusterAuth.\n",
+        "description": "Authenticate user with credentials and return a valid session token (JWT).\nThis is a public endpoint that does not require prior authentication.\n\nRequest parameters: userName and userPasswd are required (see json keys below).\nThe domain parameter is optional - if not provided, the system uses the configured\ndefault authentication domain.\n\nAvailable domains can be listed using the /logindomains endpoint. Each domain has\na specific authentication realm. Supported realms: Local, LDAP, RADIUS, TACACS, OIDC,\nMicrosoft Entra ID, and MultiClusterAuth.\n\nResponse handling:\n- 200 OK: Login successful. Cache the jwttoken value from the response to use in\n  subsequent API calls. Pass it via AuthCookie cookie or Authorization header.\n- 401 Unauthorized: Invalid credentials or account is locked. Verify username/password.\n- 403 Forbidden: Password has expired or must be changed. Call /updatePassword to set\n  a new password before attempting login again.\n\nExample - Login and extract token:\n\n```bash\nTOKEN=$(curl -sk -X POST https://<ND_IP>/api/v1/infra/login \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"userName\":\"admin\",\"userPasswd\":\"password\",\"domain\":\"local\"}' \\\n  | jq -r '.jwttoken')\n```\n\nExample - Use token with Authorization Bearer header:\n\n```bash\ncurl -sk https://<ND_IP>/api/v1/infra/aaa/localUsers \\\n  -H \"Authorization: Bearer $TOKEN\"\n```\n\nExample - Use token with AuthCookie cookie:\n\n```bash\ncurl -sk https://<ND_IP>/api/v1/infra/aaa/localUsers \\\n  -b \"AuthCookie=$TOKEN\"\n```\n",
         "operationId": "executeLogin",
         "parameters": [
           {
@@ -14376,7 +14377,7 @@
     },
     "/logindomains": {
       "get": {
-        "description": "Returns the list of available login domains, both 'local' and remote.\nFor local domains, the mandated password complexity rules are also listed.\n",
+        "description": "Returns the list of available authentication domains configured in the system.\nThis is a public endpoint that does not require authentication.\n\nWhy call this endpoint before login:\n- Get the list of available authentication domains to present to the user\n- Retrieve defaultDomain - used when domain is omitted from /login request\n- Get password complexity rules (passwordSettings) for local domains - useful for\n  password validation in registration or password change forms\n\nResponse fields:\n- defaultDomain: Name of the default authentication domain\n- domains: List of configured login domains, each containing name, realm, and\n  passwordSettings (only for Local realm - contains minimumLength and strongCheckEnabled)\n\nExample - Get available login domains:\n\n```bash\ncurl -sk https://<ND_IP>/api/v1/infra/logindomains\n```\n",
         "operationId": "getLoginDomains",
         "parameters": [
           {
@@ -14445,7 +14446,7 @@
     },
     "/logout": {
       "post": {
-        "description": "Invalidates the current session and clears authentication cookies, across the cluster and federation.\n",
+        "description": "Terminates the current user session and cleans up all associated authentication state.\nRequires authentication - must provide a valid JWT token.\n\nHow to pass the JWT token:\n- AuthCookie cookie (for browser/UI-based sessions)\n- Authcookie HTTP header (for programmatic access)\n\nCleanup operations performed:\n- Clears the AuthCookie from the browser by setting it to expire immediately\n- Invalidates the JWT token server-side, making it unusable for future requests\n- For federated/remote users, propagates the logout across the federation\n\nExample - Logout using AuthCookie cookie:\n\n```bash\ncurl -sk -X POST https://<ND_IP>/api/v1/infra/logout \\\n  -b \"AuthCookie=$TOKEN\"\n```\n\nExample - Logout using Authcookie header:\n\n```bash\ncurl -sk -X POST https://<ND_IP>/api/v1/infra/logout \\\n  -H \"Authcookie: $TOKEN\"\n```\n\nWARNING: Calling this API from the Swagger UI or API documentation interface will\nterminate your current session and you will need to log in again to continue using\nthe interface.\n",
         "operationId": "executeLogout",
         "parameters": [
           {
@@ -14457,6 +14458,24 @@
             "name": "timeout",
             "schema": {
               "example": "true",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Session JWT token passed as a cookie (for UI-based sessions).\nThe cookie is automatically set by the browser after successful login.\nEither this cookie OR the Authcookie header must be provided.\n",
+            "in": "cookie",
+            "name": "AuthCookie",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Session JWT token passed as an HTTP header (for programmatic access).\nUse this header when cookies are not available.\nEither this header OR the AuthCookie cookie must be provided.\n",
+            "in": "header",
+            "name": "Authcookie",
+            "required": false,
+            "schema": {
               "type": "string"
             }
           }
@@ -15011,13 +15030,42 @@
     },
     "/refresh": {
       "post": {
-        "description": "Renewal of session token using existing session valid token.\nThis is used to continue a session beyond a token expiry time.\n",
+        "description": "Refreshes the session token (JWT) to extend the session validity.\nRequires authentication - must provide a valid (non-expired) JWT token.\n\nThis endpoint validates the current JWT token and issues a new token with an updated\nexpiration time, allowing the session to continue beyond the original token expiry.\n\nHow to pass the JWT token:\n- AuthCookie cookie (for browser/UI-based sessions)\n- Request body as JSON with jwttoken field (for programmatic access)\n\nResponse: New JWT token in both response body (jwttoken field) and as updated\nAuthCookie cookie. Cache the new token for subsequent requests.\n\nNotes:\n- API key tokens cannot be refreshed\n- For federated environments, refresh requests are forwarded to the original issuer cluster\n\nExample - Refresh using AuthCookie cookie:\n\n```bash\nNEW_TOKEN=$(curl -sk -X POST https://<ND_IP>/api/v1/infra/refresh \\\n  -b \"AuthCookie=$TOKEN\" \\\n  | jq -r '.jwttoken')\n```\n\nExample - Refresh using request body:\n\n```bash\nNEW_TOKEN=$(curl -sk -X POST https://<ND_IP>/api/v1/infra/refresh \\\n  -H \"Content-Type: application/json\" \\\n  -d \"{\\\"jwttoken\\\":\\\"$TOKEN\\\"}\" \\\n  | jq -r '.jwttoken')\n```\n\nExample - Use the refreshed token for subsequent API calls:\n\n```bash\ncurl -sk https://<ND_IP>/api/v1/infra/aaa/localUsers \\\n  -H \"Authorization: Bearer $NEW_TOKEN\"\n```\n",
         "operationId": "executeTokenRefresh",
         "parameters": [
           {
             "$ref": "#/components/parameters/fromClusterQueryParam"
+          },
+          {
+            "description": "Current session token (JWT) passed as a cookie (for UI-based sessions).\nThe cookie is automatically set by the browser after successful login.\nEither this cookie OR the request body jwttoken field must be provided.\n",
+            "in": "cookie",
+            "name": "AuthCookie",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "jwttoken": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImI0Z2Mwb2R0Y2Q1eDlxeXVxcjFsMDdjdWViY2VrYm52IiwidHlwIjoiSldUIn0..."
+              },
+              "schema": {
+                "properties": {
+                  "jwttoken": {
+                    "description": "Current session JWT token to be refreshed",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": "JWT token for refresh (for programmatic access).\nEither this OR the AuthCookie cookie must be provided.\n",
+          "required": false
+        },
         "responses": {
           "200": {
             "content": {
@@ -18853,7 +18901,7 @@
                       "tls": false
                     }
                   ],
-                  "messageBusConfigs": [
+                  "messageBusConfigurations": [
                     {
                       "ip": "192.168.1.100",
                       "mode": "unsecured",
@@ -19952,7 +20000,7 @@
     },
     "/systemResources/actions/restart": {
       "post": {
-        "description": "Restart a specific pod.",
+        "description": "Restart a specific pod",
         "operationId": "executeRestartPod",
         "parameters": [
           {
@@ -20011,7 +20059,7 @@
             ]
           }
         ],
-        "summary": "Restart specific pod.",
+        "summary": "Restart specific pod",
         "tags": [
           "System Status"
         ]
@@ -22464,7 +22512,7 @@
     },
     "/updatePassword": {
       "post": {
-        "description": "Updates password for a local user without requiring a session token (JWT).\nThis is useful when password is expired or mandated to be changed during first login\nto the system by a given user. It validates old password before allowing the change.\n",
+        "description": "Updates password for a local user without requiring authentication (no JWT/cookie needed).\nThis is a public endpoint.\n\nWhen to use this endpoint:\n- When /login returns 403 Forbidden with message \"Password has expired, please change the password.\"\n- When /login returns 403 Forbidden with message \"Please change temporary password.\"\n\nThis endpoint validates the old password before allowing the change. After successfully\nchanging the password, call /login again with the new credentials.\n\nExample - Update expired password:\n\n```bash\ncurl -sk -X POST https://<ND_IP>/api/v1/infra/updatePassword \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"userName\":\"admin\",\"userPasswd\":\"oldpassword\",\"newPasswd\":\"newpassword\"}'\n```\n",
         "operationId": "executePasswordUpdate",
         "parameters": [
           {
@@ -22529,19 +22577,6 @@
               }
             },
             "description": "Unauthorized"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "New password must be different from old password."
-                },
-                "schema": {
-                  "$ref": "#/components/schemas/errorResponse"
-                }
-              }
-            },
-            "description": "Unprocessable Entity"
           },
           "500": {
             "content": {
@@ -23043,7 +23078,7 @@
           },
           "slackapp": {
             "value": "slackapp-1234",
-            "summary": "Slackbot integration ID"
+            "summary": "Slack integration ID"
           }
         }
       },
@@ -26379,6 +26414,9 @@
         "properties": {
           "description": {
             "description": "Optional description for the tenant",
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9!#$%()*,-./:;@ _{|}~?&+]+$",
             "type": "string"
           },
           "name": {
@@ -30281,10 +30319,6 @@
             "format": "ip",
             "type": "string"
           },
-          "description": {
-            "description": "Description of the service using this persistent IP Address.",
-            "type": "string"
-          },
           "name": {
             "description": "Name of the service using this persistent IP Address.",
             "maxLength": 64,
@@ -30421,7 +30455,8 @@
           "messageBus",
           "none",
           "nexusDashboard",
-          "cyberArk"
+          "cyberArk",
+          "aiComputeVisibility"
         ],
         "example": "webServer",
         "type": "string"
@@ -30515,7 +30550,7 @@
             },
             "type": "array"
           },
-          "messageBusConfigs": {
+          "messageBusConfigurations": {
             "description": "List of Message Bus Configurations",
             "items": {
               "allOf": [
@@ -31000,7 +31035,7 @@
         "description": "Login credentials payload",
         "properties": {
           "domain": {
-            "description": "Authentication domain (e.g., 'local', 'ldap', etc.). Defaults to 'DefaultAuth' if not provided.",
+            "description": "Authentication domain name (e.g., 'local', 'ldap-corp').\nOptional - if not provided, the system's configured default authentication\ndomain is used (the defaultDomain value from /logindomains).\n",
             "example": "local",
             "type": "string"
           },
@@ -36931,7 +36966,6 @@
           "errors": {
             "description": "An array of errors",
             "type": "array",
-            "nullable": true,
             "items": {
               "$ref": "#/components/schemas/SubError"
             }
@@ -41081,10 +41115,5 @@
         "name": "AuthCookie"
       }
     }
-  },
-  "x-nd-ExcludeFederationParametersForTags": [
-    "Multi-Cluster Connectivity",
-    "System Bootstrap",
-    "System Software"
-  ]
+  }
 }
